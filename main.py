@@ -1,8 +1,10 @@
+import numpy as np
 import pandas as pd
 from numpy import inf
 from pycanon import anonymity
 
 
+# Deletes any white spaces from column names
 def clear_white_spaces(table):
     old_column_names = table.keys().values.tolist()
     new_column_names = {}
@@ -15,15 +17,53 @@ def clear_white_spaces(table):
     return table
 
 
+# Adds * to all columns that are not QI or SA
 def clear_data(table):
+    aux = []
+    for j in range(0, len(table[table.keys().values.tolist()[0]])):
+        aux.append('*')
 
     for i in table.keys().values.tolist():
         if i not in QI and i not in SA:
-            table = table.drop(i, axis=1)
+            # table = table.drop(i, axis=1)
+            table[i] = aux
 
     return table
 
 
+def has_numbers(string):
+    return any(i.isdigit() for i in string)
+
+
+# Converts a string interval to an actual interval type, so as to facilitate the comparison of each data
+def string_to_interval(column):
+
+    new_col = []
+    for i in column:
+        aux = i[0].replace("[", "")
+        aux = aux.replace(" ", "")
+
+        if ')' in i[0]:
+            aux = aux.replace(")", "")
+            aux_2 = aux.split(",")
+            new_col.append(pd.Interval(left=float(aux_2[0]),
+                                       right=float(aux_2[1]),
+                                       closed='left'))
+        else:
+            aux = aux.replace("]", "")
+            aux_2 = aux.split(",")
+            new_col.append(pd.Interval(left=float(aux_2[0]),
+                                       right=float(aux_2[1]),
+                                       closed='both'))
+        # print(type(i[0]))
+        # new_col.append(pd.Interval(i))
+    column = new_col
+    # print(column)
+    return column
+
+
+# Generalizes a column based on its data type and return a column full of strings with each new
+# value for the dataset.
 def generalization(column, range_step, hierarchies, current_gen_level, name):
 
     if name in hierarchies is False and name in range_step is False:
@@ -39,12 +79,15 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         # print(newHie)
         aux = new_hierarchy
     else:
-        aux = range_step.get(name)[current_gen_level + 1]
+        if len(range_step[name]) > current_gen_level + 1:
+            aux = range_step[name][current_gen_level + 1]
+        else:
+            return None
 
     # Generalization of numbers
     if (isinstance(column[0][0], int) or isinstance(column[0][0], float) or
             isinstance(column[0][0], complex)):
-        print("numb")
+        # print("numb")
 
         min_range = inf
         max_range = 0
@@ -86,32 +129,31 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         for i in range(0, len(column)):
             for j in ranges:
                 if column[i][0] in j:
-                    new_col.append(j)
+                    new_col.append(str(j))
                     break
 
         column = new_col
         # print(ranges)
-        # print(column)
 
     # Generalization of strings
-    elif isinstance(column[0][0], str):
-        print("string")
+    elif isinstance(column[0][0], str) and has_numbers(column[0][0]) is False:
+        # print("string")
         for i in range(0, len(column)):
-            column[i][0] = aux[column[i][0].strip()]
-
-        # print(column)
+            column[i] = aux[column[i][0].strip()]
 
     # Generalization of ranges
     else:
-        print("range")
+        # print("range")
         min_range = inf
         max_range = 0
 
+        column = string_to_interval(column)
+
         for i in column:
-            if i[0].left > max_range:
-                max_range = i[0].right
-            if i[0].left < min_range:
-                min_range = i[0].left
+            if i.left > max_range:
+                max_range = i.right
+            if i.left < min_range:
+                min_range = i.left
 
         # print("Min: ", min_range)
         # print("Max: ", max_range)
@@ -142,8 +184,8 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         new_col = []
         for i in range(0, len(column)):
             for j in ranges:
-                if column[i][0] in j:
-                    new_col.append(j)
+                if column[i].left in j:
+                    new_col.append(str(j))
                     break
 
         column = new_col
@@ -159,38 +201,54 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
 #       value is a list of list, which index identifies each level generalizations for said
 #       quasi-identifier.
 def data_fly(table, qi, sa, k, supp_threshold, range_step={}, hierarchies={}):
-    current_supp = 0
-    len_table = len(table)
-    current_gen_level = 0
-
+    current_gen_level = {}
+    for i in table.keys().values.tolist():
+        current_gen_level[i] = 0
+    # print(current_gen_level)
     freq_cs = anonymity.k_anonymity(table, qi)
-    print(freq_cs)
-    if freq_cs >= k:
-        return table
+    qi_aux = qi
 
-    if freq_cs <= supp_threshold:
-        # Suppress tables
-        return table
+    while freq_cs < k:
 
-    else:
-        unique_values = []
-        number_of_occurrences = 0
-        index = 0
+        if freq_cs <= supp_threshold:
+            # Suppress tables
+            cs = anonymity.utils.aux_anonymity.get_equiv_class(data, qi)
 
-        # Calculate the attribute with more unique values
-        for i in range(0, len(qi)):
-            if number_of_occurrences < len(unique_values):
-                index = i
-                unique_values = table[i].keys()  # equals to list(set(words))
-                number_of_occurrences = len(unique_values)
-                # table[i].values()  # counts the elements' frequency
+            for i in cs:
+                if len(i) <= supp_threshold:
+                    table = table.drop(i, axis=0)
 
-        name = table.keys().values.tolist()[index]
-        new_ind = generalization(table[name], range_step, hierarchies,
-                                 current_gen_level, name)
-        table[name] = new_ind
+            return table
 
-        print(table[name])
+        else:
+            unique_values = []
+            number_of_occurrences = 0
+            name = " "
+
+            # Calculate the attribute with more unique values
+            for i in qi_aux:
+                if number_of_occurrences < len(np.unique(table[i])):
+                    name = i
+                    unique_values = np.unique(table[i])
+                    number_of_occurrences = len(unique_values)
+
+            # print(name)
+
+            new_ind = generalization(table[[name]].values.tolist(), range_step, hierarchies,
+                                     current_gen_level[name], name)
+            if new_ind is None:
+                # print(name)
+                qi_aux.remove(name)
+                # print("################### Cannot generalize more ###################")
+                # return table
+            else:
+                table[name] = new_ind
+        # print(qi_aux)
+
+        freq_cs = anonymity.k_anonymity(table, qi)
+        current_gen_level[name] = current_gen_level[name] + 1
+        # print(table)
+        print(freq_cs)
 
     return table
 
@@ -198,10 +256,10 @@ def data_fly(table, qi, sa, k, supp_threshold, range_step={}, hierarchies={}):
 # Function to test if the generalization function is capable of generalizing numbers, strings
 # and ranges
 def generalization_test_1():
-    file_name = "adult.csv"
-    QI = ["age", "education", "occupation", "relationship", "sex", "native-country", "workclass"]
-    SA = ["salary-class"]
-    age_hierarchy = {"age": [0, 5, 10, 20]}
+    file = "adult.csv"
+    # QI = ["age", "education", "occupation", "relationship", "sex", "native-country", "workclass"]
+    # SA = ["salary-class"]
+    age_hie = {"age": [0, 5, 10, 20]}
     workclass_hierarchy = {"workclass": [["Private", "Non-Government", "*"],
                                          ["Self-emp-not-inc", "Non-Government", "*"],
                                          ["Self-emp-inc", "Non-Government", "*"],
@@ -212,50 +270,74 @@ def generalization_test_1():
                                          ["Never-worked", "Unemployed", "*"],
                                          ["?", "Unknown", "*"]]}
 
-    data = pd.read_csv(file_name)
+    table = pd.read_csv(file)
 
     # print(type(type(DATA[["age"]].values.tolist()[0][0])))
     # print(DATA.keys().values.tolist()[0])
 
-    data = clear_white_spaces(data)
+    table = clear_white_spaces(table)
 
-    generalization(data[["workclass"]].values.tolist(), age_hierarchy, workclass_hierarchy,
+    generalization(table[["workclass"]].values.tolist(), age_hie, workclass_hierarchy,
                    0, "workclass")
 
-    new_column = generalization(data[["age"]].values.tolist(), age_hierarchy,
+    new_column = generalization(table[["age"]].values.tolist(), age_hie,
                                 workclass_hierarchy, 0, "age")
 
-    data["age"] = new_column
+    table["age"] = new_column
 
-    generalization(data[["age"]].values.tolist(), age_hierarchy, workclass_hierarchy,
-                   1, "age")
+    table["age"] = generalization(table[["age"]].values.tolist(), age_hie, workclass_hierarchy,
+                                  1, "age")
+
+    print(table)
 
 
-file_name = "hospital_extended.csv"
+######################################################################################################
+#######################################  TESTING AREA  ###############################################
+######################################################################################################
+
+
+file_name = "hospital.csv"
 QI = ["age", "gender", "city"]
 SA = ["disease"]
-age_hierarchy = {"age": [0, 2, 4]}
+age_hierarchy = {"age": [0, 2, 4, 8, 10]}
 city_hierarchy = {"city": [["Tamil Nadu", "India north", "*"],
                                      ["Kerala", "India south", "*"],
                                      ["Karnataka", "India north", "*"],
-                                     ["?", "Unknown", "*"]]}
+                                     ["?", "Unknown", "*"]],
+                  "gender": [["Female", "*"],
+                           ["Male", "*"]],
+
+                  }
 
 data = pd.read_csv(file_name)
 data = clear_white_spaces(data)
-copy_data = data
-
 data = clear_data(data)
-# print(data)
 
 data["age"] = generalization(data[["age"]].values.tolist(), age_hierarchy,
-                            city_hierarchy, 1, "age")
+                             city_hierarchy, 1, "age")
 
 data["city"] = generalization(data[["city"]].values.tolist(), age_hierarchy,
                               city_hierarchy, 0, "city")
 
 data["age"] = generalization(data[["age"]].values.tolist(), age_hierarchy,
-                            city_hierarchy, 1, "age")
+                             city_hierarchy, 1, "age")
 
-# print(data)
+# data.to_csv("data_intervals.csv", index=1)
+# print(np.unique(data["age"]))
+# print(type(data["age"][0]))
 
-print(anonymity.k_anonymity(data_fly(data, QI, SA, 2, 0, age_hierarchy, city_hierarchy), QI))
+# generalization_test_1()  # Check generalization with a different dataset
+
+data = pd.read_csv(file_name)
+data = clear_white_spaces(data)
+data = clear_data(data)
+
+print(data)
+
+# data_supp = data_fly(data, QI, SA, 2, 1, age_hierarchy, city_hierarchy)
+# print(data_supp)  # Check if it can suppress
+# print(anonymity.k_anonymity(data_supp, QI)) # Check k-anonymity of the suppressed data
+
+# Try and fix the interval data so that k-anonymity accepts it
+# print(anonymity.k_anonymity(data_fly(data, QI, SA, 2, 0, age_hierarchy, city_hierarchy), QI))  # Check new k-anonymity
+print(data_fly(data, QI, SA, 3, 0, age_hierarchy, city_hierarchy))
