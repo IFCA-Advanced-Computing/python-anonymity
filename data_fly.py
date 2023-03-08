@@ -188,8 +188,8 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
 #       value is a list of list, which index identifies each level generalizations for said
 #       quasi-identifier.
 def data_fly(table, qi, sa, k, supp_threshold, range_step={}, hierarchies={}):
-    data = clear_white_spaces(table)
-    data = clear_data(table, qi, sa)
+    table = clear_white_spaces(table)
+    table = clear_data(table, qi, sa)
 
     current_gen_level = {}
     for i in table.keys().values.tolist():
@@ -203,7 +203,7 @@ def data_fly(table, qi, sa, k, supp_threshold, range_step={}, hierarchies={}):
 
         if freq_cs <= supp_threshold:
             # Suppress tables
-            cs = anonymity.utils.aux_anonymity.get_equiv_class(data, qi)
+            cs = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
 
             for i in cs:
                 if len(i) <= supp_threshold:
