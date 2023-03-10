@@ -2,7 +2,15 @@ import numpy as np
 import pandas as pd
 from numpy import inf
 from pycanon import anonymity
+import time
 import copy
+import efficiency_metrics as em
+
+
+# GLOBAL VARIABLES
+METRICS_TIME = True  # Activate or deactivate the time metrics
+METRICS_COST = False  # Activate or deactivate the metrics for characteristics cost
+METRICS_MEMORY = False  # Activate or deactivate the memory consumption cost
 
 
 # Deletes any white spaces from column names
@@ -14,20 +22,13 @@ def clear_white_spaces(table):
         new_column_names[i] = i.strip()
 
     table = table.rename(columns=new_column_names)
-
     return table
 
 
-# Adds * to all columns that are not QI or SA
-def clear_data(table, qi, sa):
-    aux = []
-    for j in range(0, len(table[table.keys().values.tolist()[0]])):
-        aux.append('*')
-
-    for i in table.keys().values.tolist():
-        if i not in qi and i not in sa:
-            table[i] = aux
-
+# Removes all the identifiers in the database
+def suppress_identifiers(table, ident):
+    for i in ident:
+        table[i] = '*'
     return table
 
 
@@ -39,7 +40,6 @@ def has_numbers(string):
 # Converts a string interval to an actual interval type,
 # to facilitate the comparison of each data
 def string_to_interval(column):
-
     new_col = []
     for i in column:
         aux = i[0].replace("[", "")
@@ -65,7 +65,6 @@ def string_to_interval(column):
 # Generalizes a column based on its data type and return a column full of strings with each new
 # value for the dataset.
 def generalization(column, range_step, hierarchies, current_gen_level, name):
-
     if name in hierarchies is False and name in range_step is False:
         return column
 
@@ -187,49 +186,76 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
 # Hierarchies should be a dictionary which key is the name of the quasi-identifier and the
 #       value is a list of list, which index identifies each level generalizations for said
 #       quasi-identifier.
-def data_fly(table, qi, sa, k, supp_threshold, range_step={}, hierarchies={}):
+def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={}):
+
+    # TODO Metrics
+    em.start_monitor_time(METRICS_TIME)
+
+    if METRICS_COST:
+        num_op = 0
+        type = "data_fly"
+
     table = clear_white_spaces(table)
-    table = clear_data(table, qi, sa)
+    table = suppress_identifiers(table, ident)
 
     current_gen_level = {}
-    for i in table.keys().values.tolist():
+    for i in qi:
         current_gen_level[i] = 0
 
-    freq_cs = anonymity.k_anonymity(table, qi)
+    k_real = anonymity.k_anonymity(table, qi)
     qi_aux = copy.copy(qi)
-    qi_aux = np.concatenate((qi_aux, sa))
 
-    while freq_cs < k:
+    if k_real >= k:
+        print(f'The data verifies k-anonymity with k={k_real}')
+        return table
 
-        if freq_cs <= supp_threshold:
-            # Suppress tables
-            cs = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
-
-            for i in cs:
-                if len(i) <= supp_threshold:
-                    table = table.drop(i, axis=0)
-
-            return table
-
-        else:
-            number_of_occurrences = 0
-            name = " "
-
-            # Calculate the attribute with more unique values
-            for i in qi_aux:
-                if number_of_occurrences < len(np.unique(table[i])):
-                    name = i
-                    number_of_occurrences = len(np.unique(table[i]))
-
-            new_ind = generalization(table[[name]].values.tolist(), range_step, hierarchies,
-                                     current_gen_level[name], name)
-            print(name)
-            if new_ind is None:
-                qi_aux = qi_aux[qi_aux != name]
+    while k_real < k:
+        if k_real <= supp_threshold:
+            equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
+            len_ec = [len(ec) for ec in equiv_class]
+            if k > max(len_ec):
+                print(f'The anonymization cannot be carried out for the given value k={k} only by suppression')
             else:
-                table[name] = new_ind
+                data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
+                data_ec_k = data_ec[data_ec.k < k]
+                ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
+                                          for ec in data_ec_k.equiv_class.values])
+                table_new = table.drop(ec_elim).reset_index()
+                assert (anonymity.k_anonymity(table_new, qi) >= k)
 
-        freq_cs = anonymity.k_anonymity(table, qi)
+                # TODO Metrics
+                em.end_monitor_time(METRICS_TIME)
+
+                if METRICS_COST:
+                    num_op = 0
+                    em.monitor_cost(num_op, type)
+
+                return table_new
+
+        # Calculate the attribute with more unique values
+        occurrences_qi = [len(np.unique(table[i])) for i in qi_aux]
+        name = qi_aux[np.argmax(occurrences_qi)]
+
+        # TODO Metrics
+        if METRICS_COST:
+            num_op = num_op + 1
+
+        new_ind = generalization(table[[name]].values.tolist(), range_step, hierarchies,
+                                 current_gen_level[name], name)
+
+        if new_ind is None:
+            qi_aux = copy.copy(qi)
+            qi_aux.remove(name)
+        else:
+            table[name] = new_ind
+
+        k_real = anonymity.k_anonymity(table, qi)
         current_gen_level[name] = current_gen_level[name] + 1
+
+    # TODO Metrics
+    em.end_monitor_time(METRICS_TIME)
+
+    if METRICS_COST:
+        em.monitor_cost(num_op, type)
 
     return table
