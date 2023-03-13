@@ -190,6 +190,8 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
 
     # TODO Metrics
     em.start_monitor_time(METRICS_TIME)
+    em.monitor_cost_init("data_fly")
+    em.monitor_memory_consumption_start()
 
     if METRICS_COST:
         num_op = 0
@@ -225,6 +227,8 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
 
                 # TODO Metrics
                 em.end_monitor_time(METRICS_TIME)
+                em.monitor_cost("data_fly")
+                em.monitor_memory_consumption_stop()
 
                 if METRICS_COST:
                     num_op = 0
@@ -237,8 +241,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
         name = qi_aux[np.argmax(occurrences_qi)]
 
         # TODO Metrics
-        if METRICS_COST:
-            num_op = num_op + 1
+        em.monitor_cost_add("datafly")
 
         new_ind = generalization(table[[name]].values.tolist(), range_step, hierarchies,
                                  current_gen_level[name], name)
@@ -254,8 +257,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
 
     # TODO Metrics
     em.end_monitor_time(METRICS_TIME)
-
-    if METRICS_COST:
-        em.monitor_cost(num_op, type)
+    em.monitor_cost("datafly")
+    em.monitor_memory_consumption_stop()
 
     return table
