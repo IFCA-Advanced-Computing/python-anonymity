@@ -81,20 +81,3 @@ def monitor_memory_consumption_stop():
     memory = tr.get_traced_memory()
     print("Peak memory use: ", memory[1])
     tr.stop()
-
-
-# TODO NOT WORKING AT ALL, PLS DO NOT TRY TO USE IT YET
-def number_of_missing_values(original_table, modifed_table, U, L):
-    n = len(original_table.keys().values.tolist())
-    t = len(original_table[0])
-
-    a = 1/(t*n)
-
-    for i in range(0, n):
-        for j in range(0, t):
-            b = U[i, j] - L[i, j]
-            c = U[i, ] - L[i, ]
-            d = d + (b/c)
-
-    return a * d
-

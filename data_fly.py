@@ -5,6 +5,7 @@ from pycanon import anonymity
 import time
 import copy
 import efficiency_metrics as em
+import data_utility_metrics as dum
 
 
 # GLOBAL VARIABLES
@@ -113,14 +114,9 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         ranges = []
 
         for i in range(0, step):
-            if i == (step - 1):
-                ranges.append(pd.Interval(left=(min_range + aux * i),
-                                          right=(min_range + aux * (i + 1)),
-                                          closed='both'))
-            else:
-                ranges.append(pd.Interval(left=(min_range + aux * i),
-                                          right=(min_range + aux * (i + 1)),
-                                          closed='left'))
+            ranges.append(pd.Interval(left=(min_range + aux * i),
+                                      right=(min_range + aux * (i + 1)),
+                                      closed='left'))
 
         new_col = []
 
@@ -133,7 +129,7 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         column = new_col
 
     # Generalization of strings
-    elif isinstance(column[0][0], str) and has_numbers(column[0][0]) is False:
+    elif isinstance(column[0][0], str) and '[' not in column[0][0]:
         for i in range(0, len(column)):
             column[i] = aux[column[i][0].strip()]
 
@@ -141,7 +137,6 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
     else:
         min_range = inf
         max_range = 0
-
         column = string_to_interval(column)
 
         for i in column:
@@ -160,14 +155,9 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
         step = int((max_range - min_range) / aux)
         ranges = []
         for i in range(0, step):
-            if i == (step - 1):
-                ranges.append(pd.Interval(left=(min_range + aux * i),
-                                          right=(min_range + aux * (i + 1)),
-                                          closed='both'))
-            else:
-                ranges.append(pd.Interval(left=(min_range + aux * i),
-                                          right=(min_range + aux * (i + 1)),
-                                          closed='left'))
+            ranges.append(pd.Interval(left=(min_range + aux * i),
+                                      right=(min_range + aux * (i + 1)),
+                                      closed='left'))
 
         new_col = []
         for i in range(0, len(column)):
@@ -192,6 +182,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
     em.start_monitor_time(METRICS_TIME)
     em.monitor_cost_init("data_fly")
     em.monitor_memory_consumption_start()
+    dum.start_level()
 
     if METRICS_COST:
         num_op = 0
@@ -203,6 +194,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
     current_gen_level = {}
     for i in qi:
         current_gen_level[i] = 0
+        dum.get_level_generalization(i, current_gen_level[i])
 
     k_real = anonymity.k_anonymity(table, qi)
     qi_aux = copy.copy(qi)
@@ -242,7 +234,6 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
 
         # TODO Metrics
         em.monitor_cost_add("datafly")
-
         new_ind = generalization(table[[name]].values.tolist(), range_step, hierarchies,
                                  current_gen_level[name], name)
 
@@ -254,6 +245,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
 
         k_real = anonymity.k_anonymity(table, qi)
         current_gen_level[name] = current_gen_level[name] + 1
+        dum.get_level_generalization(name, current_gen_level[name])
 
     # TODO Metrics
     em.end_monitor_time(METRICS_TIME)
