@@ -60,6 +60,8 @@ hierarchy = {"marital stat": [["Single", "Not married", "*"],
 
 new_data = df.data_fly(data, ID, QI, 3, 0, age_hierarchy, hierarchy)
 print("\n", new_data)
-dum.generalized_information_loss(hierarchy, data, new_data, age_hierarchy, QI)
+print(dum.generalized_information_loss(hierarchy, data, new_data, age_hierarchy, QI))
+print(dum.discernibility(data, new_data, QI))
+print(dum.avr_equiv_class_size(data, new_data, QI))
 
 # TODO Crear función que ordene las jerarquías para las Utility metrics
