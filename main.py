@@ -1,5 +1,4 @@
 from pycanon import anonymity
-
 import data_fly as df
 import pandas as pd
 import data_utility_metrics as dum
@@ -30,7 +29,7 @@ new_data = df.data_fly(data, ID, QI, 7, 6, age_hierarchy, city_hierarchy)
 print("\n", new_data)
 print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, QI))
 
-#  ----------------------------TEST FOR DATA UTILITY METRICS -------------------------------------
+#  -------------------------------------TEST FOR DATA UTILITY METRICS ----------------------------------------------
 
 d = {'name': ["Joe", "Jill", "Sue", "Abe", "Bob", "Amy"],
      'marital stat': ["Separated", "Single", "Widowed", "Separated", "Widowed", "Single"],

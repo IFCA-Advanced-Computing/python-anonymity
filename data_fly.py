@@ -2,20 +2,22 @@ import numpy as np
 import pandas as pd
 from numpy import inf
 from pycanon import anonymity
-import time
 import copy
 import efficiency_metrics as em
 import data_utility_metrics as dum
+import typing
 
 
-# GLOBAL VARIABLES
-METRICS_TIME = True  # Activate or deactivate the time metrics
-METRICS_COST = False  # Activate or deactivate the metrics for characteristics cost
-METRICS_MEMORY = False  # Activate or deactivate the memory consumption cost
+def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
+    """Deletes any white spaces from column names.
 
+    :param table:  dataframe with the data under study.
+    :type table: pandas dataframe
 
-# Deletes any white spaces from column names
-def clear_white_spaces(table):
+    :return: table which columns don't contain whitespaces.
+    :rtype: pandas dataframe
+    """
+
     old_column_names = table.keys().values.tolist()
     new_column_names = {}
 
@@ -26,21 +28,49 @@ def clear_white_spaces(table):
     return table
 
 
-# Removes all the identifiers in the database
-def suppress_identifiers(table, ident):
+def suppress_identifiers(table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+    """Removes all the identifiers in the database.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param ident: list with the name of the columns of the dataframe
+        that are identifiers.
+    :type ident: list of strings
+
+    :return: table with the identifiers fully anonymized.
+    :rtype: pandas dataframe
+    """
+
     for i in ident:
         table[i] = '*'
     return table
 
 
-# Checks if a string contains numbers
-def has_numbers(string):
+def has_numbers(string: str) -> bool:
+    """Checks if a string contains numbers
+
+    :param string: string under study
+    :type string: python string
+
+    :return: boolean that indicates wether a string contains numbers or not.
+    :rtype: boolean
+    """
+
     return any(i.isdigit() for i in string)
 
 
-# Converts a string interval to an actual interval type,
-# to facilitate the comparison of each data
-def string_to_interval(column):
+def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+    """Converts a string interval to an actual interval type,
+    to facilitate the comparison of each data.
+
+    :param column: List of intervals as strings.
+    :type column: list of strings
+
+    :return: List containing the intervals converted to the proper data type.
+    :rtype: list of intervals
+    """
+
     new_col = []
     for i in column:
         aux = i[0].replace("[", "")
@@ -63,9 +93,29 @@ def string_to_interval(column):
     return column
 
 
-# Generalizes a column based on its data type and return a column full of strings with each new
-# value for the dataset.
-def generalization(column, range_step, hierarchies, current_gen_level, name):
+def generalization(column: typing.Union[typing.List, np.ndarray], range_step: dict, hierarchies: dict,
+                   current_gen_level: int, name: str) -> typing.Union[typing.List, np.ndarray]:
+    """Generalizes a column based on its data type.
+
+    :param column: column from the table under study that needs to be generalized.
+    :type column: list of values
+
+    :param range_step: steps for the intervals of numeric columns.
+    :type range_step: dictionary
+
+    :param hierarchies: hierarchies for generalization of string columns.
+    :type hierarchies: dictionary
+
+    :param current_gen_level: Current level of generalization of each of the columns of the table.
+    :type current_gen_level: int
+
+    :param name: Name of the column that needs to be generalized.
+    :type name: string
+
+    :return: List of generalized values.
+    :rtype: list of values
+    """
+
     if name in hierarchies is False and name in range_step is False:
         return column
 
@@ -171,22 +221,43 @@ def generalization(column, range_step, hierarchies, current_gen_level, name):
     return column
 
 
-# RangeStep should be a dictionary which key is the name of the quasi-identifier and the
-#       value is a list of different steps for each of the ranges per level of the identifier.
-# Hierarchies should be a dictionary which key is the name of the quasi-identifier and the
-#       value is a list of list, which index identifies each level generalizations for said
-#       quasi-identifier.
-def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={}):
+def data_fly(table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray],
+             qi: typing.Union[typing.List, np.ndarray], k: int,
+             supp_threshold: int, range_step: dict = {}, hierarchies: dict = {}) -> pd.DataFrame:
+    """Data-fly generalization algorithm for k-anonymity.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
+
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
+
+    :param k: desired level of k-anonymity.
+    :type k: int
+
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
+
+    :param range_step: steps for the intervals of numeric columns.
+    :type range_step: dictionary
+
+    :param hierarchies: hierarchies for generalization of string columns.
+    :type hierarchies: dictionary
+
+    :return: anonymized table.
+    :rtype: pandas dataframe
+    """
 
     # TODO Metrics
-    em.start_monitor_time(METRICS_TIME)
+    em.start_monitor_time()
     em.monitor_cost_init("data_fly")
     em.monitor_memory_consumption_start()
     dum.start_level()
-
-    if METRICS_COST:
-        num_op = 0
-        type = "data_fly"
 
     table = clear_white_spaces(table)
     table = suppress_identifiers(table, ident)
@@ -218,13 +289,9 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
                 assert (anonymity.k_anonymity(table_new, qi) >= k)
 
                 # TODO Metrics
-                em.end_monitor_time(METRICS_TIME)
+                em.end_monitor_time()
                 em.monitor_cost("data_fly")
                 em.monitor_memory_consumption_stop()
-
-                if METRICS_COST:
-                    num_op = 0
-                    em.monitor_cost(num_op, type)
 
                 return table_new
 
@@ -248,7 +315,7 @@ def data_fly(table, ident, qi, k, supp_threshold, range_step={}, hierarchies={})
         dum.get_level_generalization(name, current_gen_level[name])
 
     # TODO Metrics
-    em.end_monitor_time(METRICS_TIME)
+    em.end_monitor_time()
     em.monitor_cost("datafly")
     em.monitor_memory_consumption_stop()
 
