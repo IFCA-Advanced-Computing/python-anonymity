@@ -94,7 +94,7 @@ def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.
 
 
 def generalization(column: typing.Union[typing.List, np.ndarray], range_step: dict, hierarchies: dict,
-                   current_gen_level: int, name: str) -> typing.Union[typing.List, np.ndarray]:
+                   current_gen_level: int, name: str) -> typing.Union[typing.List, np.ndarray, None]:
     """Generalizes a column based on its data type.
 
     :param column: column from the table under study that needs to be generalized.
