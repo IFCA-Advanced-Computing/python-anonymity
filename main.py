@@ -2,6 +2,7 @@ from pycanon import anonymity
 import data_fly as df
 import pandas as pd
 import data_utility_metrics as dum
+import incognito
 
 file_name = "hospital_extended.csv"
 ID = ["name"]
@@ -62,3 +63,5 @@ print("\n", new_data)
 print("Generalized Information Loss: ", dum.generalized_information_loss(hierarchy, data, new_data, age_hierarchy, QI))
 print("Discernibility Metric: ", dum.discernibility(data, new_data, QI))
 print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(data, new_data, QI))
+
+print(incognito.generate_lattice(hierarchy))
