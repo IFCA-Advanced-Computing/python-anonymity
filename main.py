@@ -43,7 +43,7 @@ data = pd.DataFrame(data=d)
 ID = ["name"]
 QI = ["marital stat", "age", "ZIP code"]
 SA = ["crime"]
-age_hierarchy = {"age": [0, 5, 10]}
+age_hierarchy = {"age": [0, 2, 5, 10]}
 hierarchy = {"marital stat": [["Single", "Not married", "*"],
                               ["Separated", "Not married", "*"],
                               ["Divorce", "Not married", "*"],
@@ -64,4 +64,5 @@ print("Generalized Information Loss: ", dum.generalized_information_loss(hierarc
 print("Discernibility Metric: ", dum.discernibility(data, new_data, QI))
 print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(data, new_data, QI))
 
-print(incognito.generate_lattice(hierarchy))
+mix_hierarchy = dict(hierarchy,**incognito.create_ranges(data, age_hierarchy))
+print(incognito.incognito(mix_hierarchy))
