@@ -2,6 +2,7 @@ from pycanon import anonymity
 import data_fly as df
 import pandas as pd
 import data_utility_metrics as dum
+import utils
 import incognito
 
 file_name = "hospital_extended.csv"
@@ -64,5 +65,7 @@ print("Generalized Information Loss: ", dum.generalized_information_loss(hierarc
 print("Discernibility Metric: ", dum.discernibility(data, new_data, QI))
 print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(data, new_data, QI))
 
-mix_hierarchy = dict(hierarchy,**incognito.create_ranges(data, age_hierarchy))
-print(incognito.incognito(mix_hierarchy))
+# print(utils.create_ranges(data, age_hierarchy))
+mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
+print(data)
+print(incognito.incognito(data, mix_hierarchy, 3, QI, 0))

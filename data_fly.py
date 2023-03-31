@@ -99,9 +99,10 @@ def string_to_interval(
 
 def generalization(column: typing.Union[typing.List, np.ndarray],
                    range_step: dict, hierarchies: dict,
-                   current_gen_level: int, name: str
+                   current_gen_level: int,
+                   name: str
                    ) -> typing.Union[typing.List, np.ndarray, None]:
-    """Generalizes a column based on its data type.anonymity.
+    """Generalizes a column based on its data type.
 
     :param column: column from the table under study that needs to be generalized.
     :type column: list of values
@@ -147,6 +148,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
 
     # Generalization of numbers
     if isinstance(column[0][0], (complex, float, int)):
+
         min_range = inf
         max_range = 0
 
