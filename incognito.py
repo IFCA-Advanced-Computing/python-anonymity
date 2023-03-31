@@ -1,19 +1,17 @@
 import typing
-
+import copy
 import numpy as np
 import pandas as pd
 import pycanon.anonymity
-from numpy import inf
 from pycanon import anonymity
-import copy
 
 
 def new_level(current_lv, interval, lattice, limits):
-    for i in range(0, len(interval)):
-        if interval[i] < limits[i]:
+    for i, value in enumerate(interval):
+        if value < limits[i]:
             new_interval = copy.deepcopy(interval)
             new_interval[i] = new_interval[i] + 1
-            if new_interval not in  lattice[current_lv + 1]:
+            if new_interval not in lattice[current_lv + 1]:
                 lattice[current_lv + 1].append(new_interval)
     return lattice
 
@@ -24,11 +22,11 @@ def generate_lattice(hierarchies):
     limits = []
 
     for i in keys:
-        ranges_aux.append(range(0, len(hierarchies[i][0])))
+        ranges_aux.append(range(len(hierarchies[i][0])))
         limits.append(len(hierarchies[i][0]))
 
     current_lv = 0
-    lattice = {0:[[0]*len(keys)]}
+    lattice = {0: [[0] * len(keys)]}
 
     while limits not in lattice[current_lv]:
         lattice[current_lv + 1] = []
@@ -39,8 +37,11 @@ def generate_lattice(hierarchies):
     return lattice
 
 
-def generalization(column: typing.Union[typing.List, np.ndarray], range_step: dict, hierarchies: dict,
-                   current_gen_level: int, name: str) -> typing.Union[typing.List, np.ndarray, None]:
+def generalization(column: typing.Union[typing.List, np.ndarray],
+                   range_step: dict,
+                   hierarchies: dict,
+                   current_gen_level: int,
+                   name: str) -> typing.Union[typing.List, np.ndarray, None]:
     """Generalizes a column based on its data type.
 
     :param column: column from the table under study that needs to be generalized.
@@ -86,10 +87,9 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
             return None
 
     # Generalization of numbers
-    if (isinstance(column[0][0], int) or isinstance(column[0][0], float) or
-            isinstance(column[0][0], complex)):
+    if isinstance(column[0][0], (int, float, complex)):
 
-        min_range = inf
+        min_range = np.inf
         max_range = 0
 
         for i in column:
@@ -116,7 +116,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
 
         new_col = []
 
-        for i in range(0, len(column)):
+        for i in range(len(column)):
             for j in ranges:
                 if column[i][0] in j:
                     new_col.append(str(j))
@@ -131,7 +131,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
 
     # Generalization of ranges
     else:
-        min_range = inf
+        min_range = np.inf
         max_range = 0
         column = string_to_interval(column)
 
@@ -168,7 +168,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
 
 
 def generalize(table, node, hierarchies):
-    for i in range(0, len(node)):
+    for i in range(len(node)):
         table[hierarchies.keys()[i]] = generalization(table[hierarchies.keys()[i]], node[i])
 
     return table
@@ -225,7 +225,9 @@ def incognito(table, hierarchies, k, qi, supp_threshold):
     return max_lv
 
 
-def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+def string_to_interval(
+        column: typing.Union[typing.List, np.ndarray]
+) -> typing.Union[typing.List, np.ndarray]:
     """Converts a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
@@ -265,10 +267,9 @@ def create_ranges(table, range_step):
         for j in range(1, len(range_step[i])):
             aux = range_step[i][j]
             # Generalization of numbers
-            if (isinstance(table[i][0], int) or isinstance(table[i][0], np.int64) or isinstance(table[i][0], float) or
-                    isinstance(table[i][0], complex)):
+            if isinstance(table[i][0], (int, np.int64, float, complex)):
 
-                min_range = inf
+                min_range = np.inf
                 max_range = 0
 
                 for k in set(table[i]):
@@ -299,13 +300,13 @@ def create_ranges(table, range_step):
                 new_col = []
 
                 # TODO Arreglar aqui lo de añadir a los subarrays de la lista el anterior
-                for m in range(0, len(new_hie[i])):
+                for m in range(len(new_hie[i])):
                     for n in ranges:
                         if new_hie[i][m][0] in n:
                             new_hie[i][m].append(str(n))
                             break
 
-                for m in range(0, len(table[i])):
+                for m in range(len(table[i])):
                     for n in ranges:
                         if table[i][m] in n:
                             new_col.append(str(n))
@@ -315,7 +316,7 @@ def create_ranges(table, range_step):
 
             # Generalization of ranges
             else:
-                min_range = inf
+                min_range = np.inf
                 max_range = 0
                 column = string_to_interval(table[i])
 
@@ -346,7 +347,7 @@ def create_ranges(table, range_step):
                             break
 
                 new_col = []
-                for m in range(0, len(column)):
+                for m in range(len(column)):
                     for n in ranges:
                         if column[m].left in n:
                             new_col.append(str(n))
@@ -355,4 +356,3 @@ def create_ranges(table, range_step):
                 table[i] = new_col
 
         return new_hie
-
