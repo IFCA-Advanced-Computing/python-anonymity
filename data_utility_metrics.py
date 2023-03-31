@@ -1,23 +1,24 @@
-from pycanon import anonymity
-import pandas as pd
 import typing
+import pandas as pd
 import numpy as np
+from pycanon import anonymity
 
 # Global variables for metrics
 LEVEL_GEN = {}
 
 
 def start_level():
-    """ Resets the global variable which contains the generalization levels of each parameter
-    of the table of the function which is being monitored."""
+    """ Resets the global variable which contains the generalization
+    levels of each parameter of the table of the function which is
+    being monitored."""
 
     global LEVEL_GEN
     LEVEL_GEN = {}
 
 
 def get_level_generalization(name: str, level: int):
-    """ Updates the global variable which contains the generalization levels of each parameter
-    of the table of the function which is being monitored.
+    """ Updates the global variable which contains the generalization
+    levels of each parameter of the table of the function which is being monitored.
 
     :param name: Name of the column which level we want to save
     :type name: string
@@ -30,7 +31,9 @@ def get_level_generalization(name: str, level: int):
     LEVEL_GEN[name] = level
 
 
-def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+def string_to_interval(
+        column: typing.Union[typing.List, np.ndarray]
+) -> typing.Union[typing.List, np.ndarray]:
     """Converts a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
@@ -68,9 +71,12 @@ def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.
     return column
 
 
-def create_vgh(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
+def create_vgh(hierarchy: dict,
+               og_table: pd.DataFrame,
+               new_table: pd.DataFrame,
                numeric_hie: dict) -> typing.Union[typing.List, np.ndarray]:
-    """ Creates the auxiliar hierarchiies to facilitate the measuring of the information loss function.
+    """ Creates the auxiliary hierarchies to facilitate the measuring of the
+    information loss function.
 
     :param hierarchy: hierarchies for generalization of string columns.
     :type hierarchy: dictionary
@@ -84,8 +90,8 @@ def create_vgh(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
     :param numeric_hie: steps for the intervals of numeric columns.
     :type numeric_hie: dictionary
 
-    :return: an array with both the auxiliar hierarchies and the number of occurancies of each element on both the
-    original table and the anony,ized table.
+    :return: an array with both the auxiliar hierarchies and the number of
+    occurancies of each element on both the original table and the anonymized table.
     :rtype: array of dictionaries
     """
 
@@ -99,7 +105,7 @@ def create_vgh(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
             numb_vgh[j[LEVEL_GEN[i]]] = 0
 
         for j in hierarchy[i]:
-            numb_vgh[j[LEVEL_GEN[i]]] = numb_vgh[j[LEVEL_GEN[i]]] + 1
+            numb_vgh[j[LEVEL_GEN[i]]] += 1
             numb_vgh[j[0]] = 1
             vgh_aux[j[0]] = j[LEVEL_GEN[i]]
 
@@ -116,7 +122,7 @@ def create_vgh(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
             numb_vgh[j] = 1
             for k in ranges:
                 if j in k:
-                    numb_vgh[k] = numb_vgh[k] + 1
+                    numb_vgh[k] += 1
                     vgh_aux[j] = k
                     break
 
@@ -124,10 +130,14 @@ def create_vgh(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
     return [vgh, numb_vgh]
 
 
-def generalized_information_loss(hierarchy: dict, og_table: pd.DataFrame, new_table: pd.DataFrame,
-                                 numeric_hie: dict, qi: typing.Union[typing.List, np.ndarray]) -> float:
-    """Captures the penalty incurred when generalizing a table, by quantifying the fraction of the domain values
-    that have been generalized for each specific attribute.
+def generalized_information_loss(
+        hierarchy: dict,
+        og_table: pd.DataFrame,
+        new_table: pd.DataFrame,
+        numeric_hie: dict,
+        qi: typing.Union[typing.List, np.ndarray]) -> float:
+    """Captures the penalty incurred when generalizing a table, by quantifying the
+    fraction of the domain values that have been generalized for each specific attribute.
 
     :param hierarchy: hierarchies for generalization of string columns.
     :type hierarchy: dictionary
@@ -165,23 +175,24 @@ def generalized_information_loss(hierarchy: dict, og_table: pd.DataFrame, new_ta
                 c = len(vgh[i]) - 1
 
                 # print("Row : ", i, " number ", j, " - ", d, " + (", b, " / ", c, " )")
-                d = d + (b/c)
+                d = d + (b / c)
 
             # One or both parameters are interval
             else:
-                b = (string_to_interval(new_table[i][j]).right - 1) - string_to_interval(new_table[i][j]).left
+                b = (string_to_interval(new_table[i][j]).right - 1) - \
+                    string_to_interval(new_table[i][j]).left
                 c = max(og_table[i]) - min(og_table[i])
 
                 # print("Row : ", i, " number ", j, " - ", d, " + (", b, " / ", c, " )")
                 d = d + (b / c)
 
-    return (1/(t*n)) * d
+    return (1 / (t * n)) * d
 
 
 def discernibility(og_table: pd.DataFrame, new_table: pd.DataFrame,
                    qi: typing.Union[typing.List, np.ndarray]) -> float:
-    """Measures how indistinguishable a record is from others, by assigning a penalty to each record, equal to the
-    size of the EQ to which it belongs.
+    """Measures how indistinguishable a record is from others, by assigning a
+    penalty to each record, equal to the size of the EQ to which it belongs.
 
     :param og_table: dataframe with the original data under study.
     :type og_table: pandas dataframe
@@ -233,4 +244,4 @@ def avr_equiv_class_size(og_table: pd.DataFrame, new_table: pd.DataFrame,
     t = len(og_table)
     k = anonymity.k_anonymity(new_table, qi)
     eq = anonymity.utils.aux_anonymity.get_equiv_class(new_table, qi)
-    return t/(len(eq) * k)
+    return t / (len(eq) * k)

@@ -1,11 +1,11 @@
+import copy
+import typing
 import numpy as np
 import pandas as pd
 from numpy import inf
 from pycanon import anonymity
-import copy
 import efficiency_metrics as em
 import data_utility_metrics as dum
-import typing
 
 
 def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
@@ -28,7 +28,9 @@ def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
     return table
 
 
-def suppress_identifiers(table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+def suppress_identifiers(
+        table: pd.DataFrame,
+        ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
     """Removes all the identifiers in the database.
 
     :param table: dataframe with the data under study.
@@ -60,7 +62,9 @@ def has_numbers(string: str) -> bool:
     return any(i.isdigit() for i in string)
 
 
-def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+def string_to_interval(
+        column: typing.Union[typing.List,
+        np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
     """Converts a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
@@ -93,9 +97,11 @@ def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.
     return column
 
 
-def generalization(column: typing.Union[typing.List, np.ndarray], range_step: dict, hierarchies: dict,
-                   current_gen_level: int, name: str) -> typing.Union[typing.List, np.ndarray, None]:
-    """Generalizes a column based on its data type.
+def generalization(column: typing.Union[typing.List, np.ndarray],
+                   range_step: dict, hierarchies: dict,
+                   current_gen_level: int, name: str
+                   ) -> typing.Union[typing.List, np.ndarray, None]:
+    """Generalizes a column based on its data type.anonymity.
 
     :param column: column from the table under study that needs to be generalized.
     :type column: list of values
@@ -116,15 +122,15 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
     :rtype: list of values
     """
 
-    if name in hierarchies is False and name in range_step is False:
+    if (name in hierarchies is False) and (name in range_step is False):
         return column
 
     elif name in hierarchies:
         aux = hierarchies.get(name)
         new_hierarchy = {}
 
-        for i in range(0, len(aux)):
-            if len(aux[i]) > (current_gen_level + 1):
+        for i, value in enumerate(aux):
+            if len(value) > (current_gen_level + 1):
                 new_hierarchy[aux[i][current_gen_level]] = aux[i][current_gen_level + 1]
 
             else:
@@ -140,9 +146,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
             return None
 
     # Generalization of numbers
-    if (isinstance(column[0][0], int) or isinstance(column[0][0], float) or
-            isinstance(column[0][0], complex)):
-
+    if isinstance(column[0][0], (complex, float, int)):
         min_range = inf
         max_range = 0
 
@@ -170,7 +174,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
 
         new_col = []
 
-        for i in range(0, len(column)):
+        for i in range(len(column)):
             for j in ranges:
                 if column[i][0] in j:
                     new_col.append(str(j))
@@ -210,7 +214,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
                                       closed='left'))
 
         new_col = []
-        for i in range(0, len(column)):
+        for i, _ in enumerate(column):
             for j in ranges:
                 if column[i].left in j:
                     new_col.append(str(j))
@@ -221,9 +225,13 @@ def generalization(column: typing.Union[typing.List, np.ndarray], range_step: di
     return column
 
 
-def data_fly(table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray],
-             qi: typing.Union[typing.List, np.ndarray], k: int,
-             supp_threshold: int, range_step: dict = {}, hierarchies: dict = {}) -> pd.DataFrame:
+def data_fly(table: pd.DataFrame,
+             ident: typing.Union[typing.List, np.ndarray],
+             qi: typing.Union[typing.List, np.ndarray],
+             k: int,
+             supp_threshold: int,
+             range_step: dict = {},
+             hierarchies: dict = {}) -> pd.DataFrame:
     """Data-fly generalization algorithm for k-anonymity.
 
     :param table: dataframe with the data under study.
@@ -279,14 +287,15 @@ def data_fly(table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray],
             equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
             len_ec = [len(ec) for ec in equiv_class]
             if k > max(len_ec):
-                print(f'The anonymization cannot be carried out for the given value k={k} only by suppression')
+                print(f'The anonymization cannot be carried out for '
+                      f'the given value k={k} only by suppression')
             else:
                 data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
                 data_ec_k = data_ec[data_ec.k < k]
                 ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
                                           for ec in data_ec_k.equiv_class.values])
                 table_new = table.drop(ec_elim).reset_index()
-                assert (anonymity.k_anonymity(table_new, qi) >= k)
+                assert anonymity.k_anonymity(table_new, qi) >= k
 
                 # TODO Metrics
                 em.end_monitor_time()
