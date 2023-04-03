@@ -1,8 +1,48 @@
 import copy
-
+import typing
 import numpy as np
 import pandas as pd
-import typing
+
+
+def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
+    """Deletes any white spaces from column names.
+
+    :param table:  dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :return: table which columns don't contain whitespaces.
+    :rtype: pandas dataframe
+    """
+
+    old_column_names = table.keys().values.tolist()
+    new_column_names = {}
+
+    for i in old_column_names:
+        new_column_names[i] = i.strip()
+
+    table = table.rename(columns=new_column_names)
+    return table
+
+
+def suppress_identifiers(
+        table: pd.DataFrame,
+        ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+    """Removes all the identifiers in the database.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param ident: list with the name of the columns of the dataframe
+        that are identifiers.
+    :type ident: list of strings
+
+    :return: table with the identifiers fully anonymized.
+    :rtype: pandas dataframe
+    """
+
+    for i in ident:
+        table[i] = '*'
+    return table
 
 
 def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:

@@ -6,6 +6,7 @@ import pandas as pd
 import pycanon.anonymity
 from pycanon import anonymity
 from pycanon.anonymity import utils
+import data_utility_metrics as dat_ut
 
 
 def new_level(current_lv, interval, lattice, limits):
@@ -13,8 +14,8 @@ def new_level(current_lv, interval, lattice, limits):
         if value < limits[i]:
             new_interval = copy.deepcopy(interval)
             new_interval[i] = new_interval[i] + 1
-            if new_interval not in lattice[current_lv + 1]:
-                lattice[current_lv + 1].append(new_interval)
+            if new_interval not in lattice[current_lv]:
+                lattice[current_lv].append(new_interval)
     return lattice
 
 
@@ -25,16 +26,16 @@ def generate_lattice(hierarchies):
 
     for i in keys:
         ranges_aux.append(range(len(hierarchies[i][0])))
-        limits.append(len(hierarchies[i][0]))
+        limits.append(len(hierarchies[i][0]) - 1)
 
     current_lv = 0
     lattice = {0: [[0] * len(keys)]}
 
     while limits not in lattice[current_lv]:
-        lattice[current_lv + 1] = []
-        for i in lattice[current_lv]:
+        current_lv += 1
+        lattice[current_lv] = []
+        for i in lattice[current_lv - 1]:
             lattice = new_level(current_lv, i, lattice, limits)
-        current_lv = current_lv + 1
 
     return lattice
 
@@ -68,7 +69,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
         aux = hierarchies[name]
 
     # Generalization of numbers
-    if isinstance(column[0][0], (int, float, complex, np.int64)):
+    if isinstance(column[0], (int, float, complex, np.int64)):
 
         aux_col = []
         for i in range(0, len(aux)):
@@ -87,6 +88,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
 
     # Generalization of strings
     elif isinstance(column[0], str) and '[' not in column[0]:
+
         for i in range(len(column)):
             # TODO Aux esta mal, deberia ser la lista con todas las jerarquias de los "marital status"
             for j in range(len(aux)):
@@ -117,6 +119,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
 
 def generalize(table, node, hierarchies):
     for i in range(len(node)):
+
         if node[i] != 0:
             name = list(hierarchies.keys())[i]
             table[name] = generalization(table[name], hierarchies, node[i], name)
@@ -124,27 +127,29 @@ def generalize(table, node, hierarchies):
     return table
 
 
-def incognito(table, hierarchies, k, qi, supp_threshold):
+def incognito(table, hierarchies, k, qi, supp_threshold, ident):
     lattice = generate_lattice(hierarchies)
     current_lv = 0  # To check if we have traversed all the lvs
     iter_in_lv = 0  # To check if we have traversed the current lv fully
     max_lv = len(lattice.keys())
     max_iter_lv = len(lattice[current_lv])
 
-    possible_nodes = []
+    table = ut.clear_white_spaces(table)
+    table = ut.suppress_identifiers(table, ident)
+
+    possible_nodes = {}
+    traversed_nodes = []
 
     while current_lv < max_lv:
         current_node = lattice[current_lv][iter_in_lv]
-        if current_node not in possible_nodes:
-            # TODO Implementar la función generalize
-            new_table = generalize(table, current_node, hierarchies)
+
+        if current_node not in traversed_nodes:
+
+            new_table = generalize(copy.deepcopy(table), current_node, hierarchies)
 
             if k == pycanon.anonymity.k_anonymity(new_table, qi):
-                # TODO Temporalmente devuelve el primer nodo que encuentra, pero en verdad debe guardar el nodo y todos
-                #  los que se han formado a partir de él en la lista de candidatos a solución. Debere introducir un if
-                #  que compruebe si el nodo que vamos a mirar a continuación ya estas en la lista de soluciones que lo
-                #  pase.
-                return new_table
+                possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [current_node, False]
+
             elif pycanon.anonymity.k_anonymity(new_table, qi) <= supp_threshold:
                 equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
                 len_ec = [len(ec) for ec in equiv_class]
@@ -157,11 +162,10 @@ def incognito(table, hierarchies, k, qi, supp_threshold):
                                               for ec in data_ec_k.equiv_class.values])
                     new_table = table.drop(ec_elim).reset_index()
                     assert (anonymity.k_anonymity(new_table, qi) >= k)
-                    # TODO Temporalmente devuelve el primer nodo que encuentra, pero en verdad debe guardar el nodo y
-                    #  todos los que se han formado a partir de él en la lista de candidatos a solución. Debere
-                    #  introducir un if que compruebe si el nodo que vamos a mirar a continuación ya estas en la lista
-                    #  de soluciones que lo pase.
-                    return new_table
+
+                    possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [current_node, True]
+
+        traversed_nodes.append(current_node)
 
         # Reset trackers for the new level
         iter_in_lv = iter_in_lv + 1
@@ -171,4 +175,20 @@ def incognito(table, hierarchies, k, qi, supp_threshold):
             if current_lv < max_lv:
                 max_iter_lv = len(lattice[current_lv])
 
-    return max_lv
+    metric = np.inf
+    for i in possible_nodes.keys():
+        if i < metric:
+            metric = i
+            node = possible_nodes[i]
+
+    if node[1] is True:
+        equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(generalize(table, node[0], hierarchies), qi)
+        len_ec = [len(ec) for ec in equiv_class]
+        data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
+        data_ec_k = data_ec[data_ec.k < k]
+        ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
+                                  for ec in data_ec_k.equiv_class.values])
+        return table.drop(ec_elim).reset_index()
+
+    return generalize(table, node[0], hierarchies)
+

@@ -68,4 +68,4 @@ print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(data, 
 # print(utils.create_ranges(data, age_hierarchy))
 mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
 print(data)
-print(incognito.incognito(data, mix_hierarchy, 3, QI, 0))
+print(incognito.incognito(data, mix_hierarchy, 3, QI, 0, ID))
