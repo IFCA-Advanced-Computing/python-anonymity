@@ -1,12 +1,14 @@
-from pycanon import anonymity
-import data_fly as df
-import pandas as pd
-import data_utility_metrics as dum
+import copy
 import utils
 import incognito
+import pandas as pd
+import data_fly as df
+from pycanon import anonymity
+import data_utility_metrics as dum
+
 
 file_name = "hospital_extended.csv"
-ID = ["name"]
+ID = ["name", "religion"]
 QI = ["age", "gender", "city"]
 SA = ["disease"]
 age_hierarchy = {"age": [0, 2, 4, 8, 10]}
@@ -25,11 +27,11 @@ city_hierarchy = {"city": [["Tamil Nadu", "India north", "*"],
 
 #  ----------------------------------------------TEST FOR DATA_FLY-------------------------------------------------
 
-data = pd.read_csv(file_name)
-
-new_data = df.data_fly(data, ID, QI, 7, 6, age_hierarchy, city_hierarchy)
-print("\n", new_data)
-print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, QI))
+# data = pd.read_csv(file_name)
+# mix_hierarchy = dict(city_hierarchy, **utils.create_ranges(data, age_hierarchy))
+# new_data = df.data_fly(data, ID, QI, 7, 6, mix_hierarchy)
+# print("\n", new_data)
+# print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, QI))
 
 #  -------------------------------------TEST FOR DATA UTILITY METRICS ----------------------------------------------
 
@@ -59,13 +61,23 @@ hierarchy = {"marital stat": [["Single", "Not married", "*"],
                           ["32027", "3202*", "*"]]
              }
 
-new_data = df.data_fly(data, ID, QI, 3, 0, age_hierarchy, hierarchy)
-print("\n", new_data)
-print("Generalized Information Loss: ", dum.generalized_information_loss(hierarchy, data, new_data, age_hierarchy, QI))
-print("Discernibility Metric: ", dum.discernibility(data, new_data, QI))
-print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(data, new_data, QI))
-
-# print(utils.create_ranges(data, age_hierarchy))
-mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
 print(data)
-print(incognito.incognito(data, mix_hierarchy, 3, QI, 0, ID))
+mix_hierarchy = dict(hierarchy, **utils.create_ranges(copy.deepcopy(data), age_hierarchy))
+new_data = df.data_fly(copy.deepcopy(data), ID, copy.deepcopy(QI), 5, 0, mix_hierarchy)
+print("\n", new_data)
+print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, copy.deepcopy(QI)))
+print("Generalized Information Loss: ", dum.generalized_information_loss(mix_hierarchy, copy.deepcopy(data),
+                                                                         new_data, copy.deepcopy(QI)))
+print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), new_data, copy.deepcopy(QI)))
+print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), new_data,
+                                                                          copy.deepcopy(QI)))
+
+# TODO La metrica de GIL no va bien, ya que sale el mismo resultado en ambos casos
+new_data = incognito.incognito(copy.deepcopy(data), mix_hierarchy, 3, copy.deepcopy(QI), 0, ID)
+print("\n", new_data)
+print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, copy.deepcopy(QI)))
+print("Generalized Information Loss: ", dum.generalized_information_loss(mix_hierarchy, copy.deepcopy(data),
+                                                                         new_data, copy.deepcopy(QI)))
+print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), new_data, copy.deepcopy(QI)))
+print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), new_data,
+                                                                          copy.deepcopy(QI)))

@@ -1,6 +1,6 @@
 import typing
-import pandas as pd
 import numpy as np
+import pandas as pd
 from pycanon import anonymity
 
 # Global variables for metrics
@@ -71,10 +71,7 @@ def string_to_interval(
     return column
 
 
-def create_vgh(hierarchy: dict,
-               og_table: pd.DataFrame,
-               new_table: pd.DataFrame,
-               numeric_hie: dict) -> typing.Union[typing.List, np.ndarray]:
+def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
     """ Creates the auxiliary hierarchies to facilitate the measuring of the
     information loss function.
 
@@ -111,22 +108,6 @@ def create_vgh(hierarchy: dict,
 
         vgh[i] = vgh_aux
 
-    for i in numeric_hie.keys():
-        vgh_aux = {}
-        ranges = string_to_interval(new_table[i].unique())
-
-        for r in ranges:
-            numb_vgh[r] = 0
-
-        for j in og_table[i].unique():
-            numb_vgh[j] = 1
-            for k in ranges:
-                if j in k:
-                    numb_vgh[k] += 1
-                    vgh_aux[j] = k
-                    break
-
-        vgh[i] = vgh_aux
     return [vgh, numb_vgh]
 
 
@@ -134,7 +115,6 @@ def generalized_information_loss(
         hierarchy: dict,
         og_table: pd.DataFrame,
         new_table: pd.DataFrame,
-        numeric_hie: dict,
         qi: typing.Union[typing.List, np.ndarray]) -> float:
     """Captures the penalty incurred when generalizing a table, by quantifying the
     fraction of the domain values that have been generalized for each specific attribute.
@@ -158,7 +138,7 @@ def generalized_information_loss(
     :return: The penalty incurred when generalizing a table.
     :rtype: float
     """
-    vgh_aux = create_vgh(hierarchy, og_table, new_table, numeric_hie)
+    vgh_aux = create_vgh(hierarchy)
     vgh = vgh_aux[0]
     numb_vgh = vgh_aux[1]
 
@@ -170,21 +150,10 @@ def generalized_information_loss(
     for i in qi:
         for j in range(0, t):
             # One or both parameters are strings
-            if isinstance(og_table[i][j], str) and '[' not in new_table[i][j]:
-                b = numb_vgh[vgh[i][og_table[i][j]]] - numb_vgh[og_table[i][j]]
-                c = len(vgh[i]) - 1
+            b = numb_vgh[vgh[i][og_table[i][j]]] - numb_vgh[og_table[i][j]]
+            c = len(vgh[i]) - 1
 
-                # print("Row : ", i, " number ", j, " - ", d, " + (", b, " / ", c, " )")
-                d = d + (b / c)
-
-            # One or both parameters are interval
-            else:
-                b = (string_to_interval(new_table[i][j]).right - 1) - \
-                    string_to_interval(new_table[i][j]).left
-                c = max(og_table[i]) - min(og_table[i])
-
-                # print("Row : ", i, " number ", j, " - ", d, " + (", b, " / ", c, " )")
-                d = d + (b / c)
+            d = d + (b / c)
 
     return (1 / (t * n)) * d
 

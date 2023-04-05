@@ -58,6 +58,9 @@ def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.
 
     new_col = []
     for i in column:
+        if isinstance(i, list):
+            return column
+
         aux = i.replace("[", "")
         aux = aux.replace(" ", "")
 
@@ -169,3 +172,85 @@ def create_ranges(data, range_step):
                 table[i] = new_col
 
         return new_hie
+
+
+def generalization(column: typing.Union[typing.List, np.ndarray],
+                   hierarchies: dict,
+                   gen_level: int, name: str
+                   ) -> typing.Union[typing.List, np.ndarray, None]:
+
+    """Generalizes a column based on its data type.
+
+    :param column: column from the table under study that needs to be generalized.
+    :type column: list of values
+
+    :param hierarchies: hierarchies for generalization of string columns.
+    :type hierarchies: dictionary
+
+    :param gen_level: Current level of generalization of each of the columns of the table.
+    :type gen_level: int
+
+    :param name: Name of the column that needs to be generalized.
+    :type name: string
+
+    :return: List of generalized values.
+    :rtype: list of values
+    """
+
+    if name in hierarchies is False:
+        return column
+
+    else:
+        if len(hierarchies[name][0]) > gen_level:
+            aux = hierarchies[name]
+        else:
+            return None
+
+    # Generalization of numbers
+    if isinstance(column[0], (int, float, complex, np.int64)):
+
+        aux_col = []
+        for i in range(0, len(aux)):
+            aux_col.append(aux[i][gen_level])
+
+        ranges = string_to_interval(aux_col)
+        new_col = []
+
+        for i in range(len(column)):
+            for j in ranges:
+                if column[i] in j:
+                    new_col.append(str(j))
+                    break
+
+        column = new_col
+
+    # Generalization of strings
+    elif isinstance(column[0], str) and '[' not in column[0]:
+
+        for i in range(len(column)):
+            # TODO Aux esta mal, deberia ser la lista con todas las jerarquias de los "marital status"
+            for j in range(len(aux)):
+                if aux[j][0] == column[i]:
+                    column[i] = aux[j][gen_level]
+                    break
+
+    # Generalization of ranges
+    else:
+        column = string_to_interval(column)
+        aux_col = []
+        for i in range(len(aux)):
+            aux_col.append(aux[i][gen_level])
+
+        ranges = string_to_interval(aux_col)
+
+        new_col = []
+        for i in range(len(column)):
+            for j in ranges:
+                if column[i].left in j:
+                    new_col.append(str(j))
+                    break
+
+        column = new_col
+
+    return column
+
