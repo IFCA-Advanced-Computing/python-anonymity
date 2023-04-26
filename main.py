@@ -5,7 +5,7 @@ import pandas as pd
 import data_fly as df
 from pycanon import anonymity
 import data_utility_metrics as dum
-
+from l_diversity import apply_l_diversity, apply_l_diversity_v2
 
 file_name = "hospital_extended.csv"
 ID = ["name", "religion"]
@@ -65,19 +65,28 @@ print(data)
 mix_hierarchy = dict(hierarchy, **utils.create_ranges(copy.deepcopy(data), age_hierarchy))
 new_data = df.data_fly(copy.deepcopy(data), ID, copy.deepcopy(QI), 5, 0, mix_hierarchy)
 print("\n", new_data)
-print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, copy.deepcopy(QI)))
+print("\n", "K-anonymity: ", anonymity.k_anonymity(copy.deepcopy(new_data), copy.deepcopy(QI)))
 print("Generalized Information Loss: ", dum.generalized_information_loss(mix_hierarchy, copy.deepcopy(data),
-                                                                         new_data, copy.deepcopy(QI)))
-print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), new_data, copy.deepcopy(QI)))
-print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), new_data,
+                                                                         copy.deepcopy(new_data), copy.deepcopy(QI)))
+print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), copy.deepcopy(new_data), copy.deepcopy(QI)))
+print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), copy.deepcopy(new_data),
                                                                           copy.deepcopy(QI)))
 
 # TODO La metrica de GIL no va bien, ya que sale el mismo resultado en ambos casos
 new_data = incognito.incognito(copy.deepcopy(data), mix_hierarchy, 3, copy.deepcopy(QI), 0, ID)
 print("\n", new_data)
-print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, copy.deepcopy(QI)))
+print("\n", "K-anonymity: ", anonymity.k_anonymity(copy.deepcopy(new_data), copy.deepcopy(QI)))
 print("Generalized Information Loss: ", dum.generalized_information_loss(mix_hierarchy, copy.deepcopy(data),
-                                                                         new_data, copy.deepcopy(QI)))
-print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), new_data, copy.deepcopy(QI)))
-print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), new_data,
+                                                                         copy.deepcopy(new_data), copy.deepcopy(QI)))
+print("Discernibility Metric: ", dum.discernibility(copy.deepcopy(data), copy.deepcopy(new_data), copy.deepcopy(QI)))
+print("Average Equivalence Class Size Metric: ", dum.avr_equiv_class_size(copy.deepcopy(data), copy.deepcopy(new_data),
                                                                           copy.deepcopy(QI)))
+
+sa_hierarchy = {"crime": [["Murder", "Violent crime", "*"],
+                ["Theft", "Non violent crime", "*"],
+                ["Traffic", "Non violent crime", "*"],
+                ["Assault", "Violent crime", "*"],
+                ["Piracy", "Non violent crime", "*"],
+                ["Indecency", "Non violent crime", "*"]]
+                }
+print(apply_l_diversity_v2(new_data, SA, QI, "data_fly", 2, ID, sa_hierarchy))

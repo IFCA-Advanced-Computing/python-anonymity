@@ -1,4 +1,6 @@
 import copy
+import typing
+
 import numpy as np
 import utils as ut
 import pandas as pd
@@ -41,7 +43,6 @@ def generate_lattice(hierarchies):
 
 def generalize(table, node, hierarchies):
     for i in range(len(node)):
-
         if node[i] != 0:
             name = list(hierarchies.keys())[i]
             table[name] = ut.generalization(table[name], hierarchies, node[i], name)
@@ -49,7 +50,34 @@ def generalize(table, node, hierarchies):
     return table
 
 
-def incognito(table, hierarchies, k, qi, supp_threshold, ident):
+def incognito(table: pd.DataFrame, hierarchies: dict, k: int, qi: typing.Union[typing.List, np.ndarray],
+              supp_threshold: int, ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+    """Incognito generalization algorithm for k-anonymity.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
+
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
+
+    :param k: desired level of k-anonymity.
+    :type k: int
+
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
+
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
+
+    :return: anonymized table.
+    :rtype: pandas dataframe
+    """
+
     lattice = generate_lattice(hierarchies)
     current_lv = 0  # To check if we have traversed all the lvs
     iter_in_lv = 0  # To check if we have traversed the current lv fully

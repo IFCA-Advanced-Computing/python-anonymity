@@ -33,10 +33,7 @@ def data_fly(table: pd.DataFrame,
     :param supp_threshold: level of suppression allowed.
     :type supp_threshold: int
 
-    :param range_step: steps for the intervals of numeric columns.
-    :type range_step: dictionary
-
-    :param hierarchies: hierarchies for generalization of string columns.
+    :param hierarchies: hierarchies for generalization of columns.
     :type hierarchies: dictionary
 
     :return: anonymized table.

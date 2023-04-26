@@ -158,6 +158,7 @@ def generalized_information_loss(
     return (1 / (t * n)) * d
 
 
+# TODO discernibility pero me pasan K
 def discernibility(og_table: pd.DataFrame, new_table: pd.DataFrame,
                    qi: typing.Union[typing.List, np.ndarray]) -> float:
     """Measures how indistinguishable a record is from others, by assigning a
