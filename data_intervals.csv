@@ -1,0 +1,11 @@
+,name,age,gender,city,religion,disease
+0,*,"[20.0, 30.0)",*,India north,*,Cancer
+1,*,"[20.0, 30.0)",*,India south,*,Viralinfection
+2,*,"[20.0, 30.0)",*,India north,*,TB
+3,*,"[20.0, 30.0)",*,India north,*,No illness
+4,*,"[20.0, 30.0)",*,India south,*,Heart-related
+5,*,"[10.0, 20.0)",*,India north,*,TB
+6,*,"[10.0, 20.0)",*,India south,*,Cancer
+7,*,"[20.0, 30.0)",*,India north,*,Heart-related
+8,*,"[10.0, 20.0)",*,India south,*,Heart-related
+9,*,"[10.0, 20.0)",*,India south,*,Viralinfection
