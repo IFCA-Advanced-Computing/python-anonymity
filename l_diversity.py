@@ -7,22 +7,9 @@ from data_fly import data_fly
 from incognito import incognito
 
 
-def l_diversity(eq: typing.Union[typing.List, np.ndarray]) -> int:
-    """Counts the l-diversity of a given equivalence class
-
-    :param eq: equivalence class under study.
-    :type eq: list
-
-    :return: l-diversity of a given equivalence class.
-    :rtype: pandas dataframe
-    """
-    un_values = np.unique(eq)
-    return len(un_values)
-
-
 def get_diversities(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
                     qi: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
-    # Nos devuelve arrays con los indices de cada clase de quivalencia
+    # Nos devuelve arrays con los indices de cada clase de equivalencia
     """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
 
     :param table: dataframe with the data under study.
@@ -30,6 +17,8 @@ def get_diversities(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarra
 
     :param sa: list with the name of the columns of the dataframe.
         that are sensitive attributes.
+        # TODO: si sa es una lista (peude haber más de un SA),  hay que trabajarlo a parte.
+        # podemos tomar en el principio solo pueda haber un atributo sensible
     :type sa: list of strings
 
     :param qi: list which contains a list of arrays which represent each equivalence class and a list with
@@ -39,19 +28,11 @@ def get_diversities(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarra
     equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
 
     equiv_sa = []
-    count = 0
-    for i in equiv_class:
-        equiv_sa.append([])
-        for j in i:
-            equiv_sa[count].append(table[sa].values.tolist()[j][0])
-        count += 1
+    for ec in equiv_class:
+        tmp = table.iloc[ec]
+        equiv_sa.append(tmp[sa].values)
 
-    result = []
-    for i in equiv_sa:
-        # print(i)
-        res = l_diversity(i)
-        result.append(res)
-    # print(result)
+    result = [len(np.unique(ec_sa)) for ec_sa in equiv_sa] # Numero de valores del SA distintos en cada EC
     return [equiv_sa, result]
 
 
@@ -78,28 +59,38 @@ def get_l(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
 
 
 # TODO Añadir una version en la que el usuario nos meta el % de registros que permite suprimir
-def apply_l_diversity_supp(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                           qi: typing.Union[typing.List, np.ndarray], l: int) -> pd.DataFrame:
-    if get_l(table, qi, sa) < l:
-        print("l-diversity satisfied")
+def apply_l_diversity_supp(table: pd.DataFrame,
+                           sa: typing.Union[typing.List, np.ndarray],
+                           qi: typing.Union[typing.List, np.ndarray],
+                           l: int,
+                           supp_records: float = 1) -> pd.DataFrame:
+    l_real = anonymity.l_diversity(table, qi, sa)
+    if l_real < l:
+        print(f"l-diversity is satisfied with l={l_real}")
         return table
 
     equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
     l_eq_c = get_diversities(table, sa, qi)[1]
 
     if l > max(l_eq_c):
-        print("l-diversity cannot be satisfied with suppression")
+        print("l-diversity cannot be satisfied only with row suppression")
         return table
 
     else:
-        data_ec = pd.DataFrame({'equiv_class': equiv_class, 'l': l_eq_c})
-        data_ec_l = data_ec[data_ec.l_eq_c < l]
-        ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
-                                  for ec in data_ec_l.equiv_class.values])
-        table_new = table.drop(ec_elim).reset_index()
-        assert anonymity.l_diversity(table_new, qi, sa) >= l
-
-        return table_new
+        supp_rate = 0
+        while supp_rate <= supp_records:
+            data_ec = pd.DataFrame({'equiv_class': equiv_class, 'l': l_eq_c})
+            data_ec_l = data_ec[data_ec.l_eq_c < l]
+            ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
+                                          for ec in data_ec_l.equiv_class.values])
+            table_new = table.drop(ec_elim).reset_index()
+            supp_rate = (len(table)-len(table_new))/len(table)
+            if supp_rate > supp_records:
+                print(f"l-diversity cannot be satisfied by deleting less than "
+                      f"{supp_records*100}% of the records.")
+                return
+            assert anonymity.l_diversity(table_new, qi, sa) >= l
+            return table_new
 
 
 # TODO Suprimir por columnas, ordenar QI por importancia
