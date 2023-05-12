@@ -88,9 +88,10 @@ def apply_l_diversity_supp(table: pd.DataFrame,
             if supp_rate > supp_records:
                 print(f"l-diversity cannot be satisfied by deleting less than "
                       f"{supp_records*100}% of the records.")
-                return
-            assert anonymity.l_diversity(table_new, qi, sa) >= l
-            return table_new
+                return table
+            else:
+                assert anonymity.l_diversity(table_new, qi, sa) >= l
+                return table_new
 
 
 # TODO Suprimir por columnas, ordenar QI por importancia
@@ -100,9 +101,9 @@ def apply_l_diversity_qi(table: pd.DataFrame, sa: typing.Union[typing.List, np.n
         print("l-diversity satisfied")
         return table
 
-        for i in qi:
-            new_table = table.copy()
-            # TODO esto no es similar al de abajo?
+    for i in qi:
+        new_table = table.copy()
+        # TODO esto no es similar al de abajo?
 
 
 # La idea es que usando las funciones auxiliares de arriba esto devolviera una nueva tabla anonimizada
