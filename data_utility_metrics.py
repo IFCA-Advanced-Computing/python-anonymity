@@ -116,6 +116,7 @@ def generalized_information_loss(
         og_table: pd.DataFrame,
         new_table: pd.DataFrame,
         qi: typing.Union[typing.List, np.ndarray]) -> float:
+    # TODO: check new_table (unused)
     """Captures the penalty incurred when generalizing a table, by quantifying the
     fraction of the domain values that have been generalized for each specific attribute.
 
@@ -182,13 +183,11 @@ def discernibility(og_table: pd.DataFrame, new_table: pd.DataFrame,
     k = anonymity.k_anonymity(new_table, qi)
     eq = anonymity.utils.aux_anonymity.get_equiv_class(new_table, qi)
     a = 0
-
     for i in eq:
         if len(i) >= k:
-            a = a + pow(len(i), 2)
+            a += pow(len(i), 2)
         else:
-            a = a + t * len(i)
-
+            a += t * len(i)
     return a
 
 
