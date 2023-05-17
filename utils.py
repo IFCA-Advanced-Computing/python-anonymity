@@ -197,8 +197,8 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
     :rtype: list of values
     """
 
-    if name in hierarchies is False:
-        return column
+    if name not in hierarchies.keys():
+        return None
 
     else:
         if len(hierarchies[name][0]) > gen_level:
@@ -208,7 +208,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
 
     # Generalization of numbers
     if isinstance(column[0], (int, float, complex, np.int64)):
-
+        # print("INT")
         aux_col = []
         for i in range(0, len(aux)):
             aux_col.append(aux[i][gen_level])
@@ -226,16 +226,16 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
 
     # Generalization of strings
     elif isinstance(column[0], str) and '[' not in column[0]:
-
+        # print("STRING")
         for i in range(len(column)):
-            # TODO Aux esta mal, deberia ser la lista con todas las jerarquias de los "marital status"
             for j in range(len(aux)):
-                if aux[j][0] == column[i]:
+                if aux[j][gen_level - 1] == column[i]:
                     column[i] = aux[j][gen_level]
                     break
 
     # Generalization of ranges
     else:
+        # print("RANGE")
         column = string_to_interval(column)
         aux_col = []
         for i in range(len(aux)):

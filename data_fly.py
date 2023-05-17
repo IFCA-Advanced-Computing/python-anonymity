@@ -55,7 +55,8 @@ def data_fly(table: pd.DataFrame,
         dum.get_level_generalization(i, current_gen_level[i])
 
     k_real = anonymity.k_anonymity(table, qi)
-    qi_aux = copy.copy(qi)
+    qi_aux = copy.deepcopy(qi)
+    # og_table = copy.deepcopy(table)
 
     if k_real >= k:
         print(f'The data verifies k-anonymity with k={k_real}')
@@ -84,6 +85,10 @@ def data_fly(table: pd.DataFrame,
                 return table_new
 
         # Calculate the attribute with more unique values
+        if len(qi_aux) == 0:
+            print(f'The anonymization cannot be carried out for '
+                      f'the given value k={k}')
+            return table
         occurrences_qi = [len(np.unique(table[i])) for i in qi_aux]
         name = qi_aux[np.argmax(occurrences_qi)]
 
@@ -93,15 +98,16 @@ def data_fly(table: pd.DataFrame,
                                     current_gen_level[name] + 1, name)
 
         if new_ind is None:
-            if name in qi:
-                qi.remove(name)
-                qi_aux = copy.copy(qi)
+            if name in qi_aux:
+                qi_aux.remove(name)
         else:
             table[name] = new_ind
             current_gen_level[name] = current_gen_level[name] + 1
 
         k_real = anonymity.k_anonymity(table, qi)
+        # print(k_real)
         dum.get_level_generalization(name, current_gen_level[name])
+        # print(table)
 
     # TODO Metrics
     em.end_monitor_time()
