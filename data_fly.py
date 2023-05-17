@@ -8,12 +8,14 @@ import efficiency_metrics as em
 import data_utility_metrics as dum
 
 
-def data_fly(table: pd.DataFrame,
-             ident: typing.Union[typing.List, np.ndarray],
-             qi: typing.Union[typing.List, np.ndarray],
-             k: int,
-             supp_threshold: int,
-             hierarchies: dict = {}) -> pd.DataFrame:
+def data_fly(
+    table: pd.DataFrame,
+    ident: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k: int,
+    supp_threshold: int,
+    hierarchies: dict = {},
+) -> pd.DataFrame:
     """Data-fly generalization algorithm for k-anonymity.
 
     :param table: dataframe with the data under study.
@@ -58,7 +60,7 @@ def data_fly(table: pd.DataFrame,
     qi_aux = copy.copy(qi)
 
     if k_real >= k:
-        print(f'The data verifies k-anonymity with k={k_real}')
+        print(f"The data verifies k-anonymity with k={k_real}")
         return table
 
     while k_real < k:
@@ -66,13 +68,19 @@ def data_fly(table: pd.DataFrame,
             equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
             len_ec = [len(ec) for ec in equiv_class]
             if k > max(len_ec):
-                print(f'The anonymization cannot be carried out for '
-                      f'the given value k={k} only by suppression')
+                print(
+                    f"The anonymization cannot be carried out for "
+                    f"the given value k={k} only by suppression"
+                )
             else:
-                data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
+                data_ec = pd.DataFrame({"equiv_class": equiv_class, "k": len_ec})
                 data_ec_k = data_ec[data_ec.k < k]
-                ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
-                                          for ec in data_ec_k.equiv_class.values])
+                ec_elim = np.concatenate(
+                    [
+                        anonymity.utils.aux_functions.convert(ec)
+                        for ec in data_ec_k.equiv_class.values
+                    ]
+                )
                 table_new = table.drop(ec_elim).reset_index()
                 assert anonymity.k_anonymity(table_new, qi) >= k
 
@@ -89,8 +97,9 @@ def data_fly(table: pd.DataFrame,
 
         # TODO Metrics
         em.monitor_cost_add("datafly")
-        new_ind = ut.generalization(table[name].values.tolist(), hierarchies,
-                                    current_gen_level[name] + 1, name)
+        new_ind = ut.generalization(
+            table[name].values.tolist(), hierarchies, current_gen_level[name] + 1, name
+        )
 
         if new_ind is None:
             if name in qi:
