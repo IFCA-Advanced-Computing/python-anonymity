@@ -231,7 +231,7 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
             # TODO Aux esta mal, deberia ser la lista con todas las jerarquias de los "marital status"
             for j in range(len(aux)):
                 if aux[j][0] == column[i]:
-                    column[i] = aux[j][gen_level]
+                    column[i] = aux[j].loc[gen_level]
                     break
 
     # Generalization of ranges
