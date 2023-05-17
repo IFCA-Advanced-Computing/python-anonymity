@@ -210,7 +210,7 @@ def apply_l_diversity_v2(table: pd.DataFrame, sa: typing.Union[typing.List, np.n
                 print("l-diversity satisfied after anonymization with data-fly")
                 return new_table
 
-            print("Unable to satisfy " + l + " l-diversity")
+            print(f"Unable to satisfy l-diversity with l={l}")
             return table
 
         else:

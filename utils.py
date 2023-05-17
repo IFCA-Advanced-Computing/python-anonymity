@@ -225,13 +225,17 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
         column = new_col
 
     # Generalization of strings
-    elif isinstance(column[0], str) and '[' not in column[0]:
 
+    elif isinstance(column[0], str) and '[' not in column[0]:
+        if isinstance(column, list):
+            pass
+        else:
+            column = column.values
         for i in range(len(column)):
             # TODO Aux esta mal, deberia ser la lista con todas las jerarquias de los "marital status"
             for j in range(len(aux)):
                 if aux[j][0] == column[i]:
-                    column[i] = aux[j].loc[gen_level]
+                    column[i] = aux[j][gen_level]
                     break
 
     # Generalization of ranges
