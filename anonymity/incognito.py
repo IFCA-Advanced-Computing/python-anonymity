@@ -2,19 +2,19 @@ import copy
 import typing
 
 import numpy as np
-import utils as ut
+from anonymity import utils as ut
 import pandas as pd
 import pycanon.anonymity
 from pycanon import anonymity
 from pycanon.anonymity import utils
-import data_utility_metrics as dat_ut
+import anonymity.metrics.data_utility_metrics as dat_ut
 
 
 def new_level(current_lv, interval, lattice, limits):
     for i, value in enumerate(interval):
         if value < limits[i]:
             new_interval = copy.deepcopy(interval)
-            new_interval[i] = new_interval[i] + 1
+            new_interval[i] += 1
             if new_interval not in lattice[current_lv]:
                 lattice[current_lv].append(new_interval)
     return lattice

@@ -1,11 +1,11 @@
 import copy
 import typing
-import utils as ut
+from anonymity import utils as ut
 import numpy as np
 import pandas as pd
 from pycanon import anonymity
-import efficiency_metrics as em
-import data_utility_metrics as dum
+import anonymity.metrics.efficiency_metrics as em
+import anonymity.metrics.data_utility_metrics as dum
 
 
 def data_fly(

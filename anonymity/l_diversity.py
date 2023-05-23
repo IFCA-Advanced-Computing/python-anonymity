@@ -3,8 +3,8 @@ import typing
 import numpy as np
 import pandas as pd
 from pycanon import anonymity
-from data_fly import data_fly
-from incognito import incognito
+from anonymity.data_fly import data_fly
+from anonymity.incognito import incognito
 
 
 def get_diversities(
@@ -20,7 +20,7 @@ def get_diversities(
 
     :param sa: list with the name of the columns of the dataframe.
         that are sensitive attributes.
-        # TODO: si sa es una lista (peude haber más de un SA),  hay que trabajarlo a parte.
+        # TODO: si sa es una lista (puede haber más de un SA),  hay que trabajarlo a parte.
         # podemos tomar en el principio solo pueda haber un atributo sensible
     :type sa: list of strings
 
