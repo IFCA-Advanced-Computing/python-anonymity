@@ -2,19 +2,19 @@ import copy
 import typing
 
 import numpy as np
-import utils as ut
+from anonymity import utils as ut
 import pandas as pd
 import pycanon.anonymity
 from pycanon import anonymity
 from pycanon.anonymity import utils
-import data_utility_metrics as dat_ut
+import anonymity.metrics.data_utility_metrics as dat_ut
 
 
 def new_level(current_lv, interval, lattice, limits):
     for i, value in enumerate(interval):
         if value < limits[i]:
             new_interval = copy.deepcopy(interval)
-            new_interval[i] = new_interval[i] + 1
+            new_interval[i] += 1
             if new_interval not in lattice[current_lv]:
                 lattice[current_lv].append(new_interval)
     return lattice
@@ -50,8 +50,14 @@ def generalize(table, node, hierarchies):
     return table
 
 
-def incognito(table: pd.DataFrame, hierarchies: dict, k: int, qi: typing.Union[typing.List, np.ndarray],
-              supp_threshold: int, ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+def incognito(
+    table: pd.DataFrame,
+    hierarchies: dict,
+    k: int,
+    qi: typing.Union[typing.List, np.ndarray],
+    supp_threshold: int,
+    ident: typing.Union[typing.List, np.ndarray],
+) -> pd.DataFrame:
     """Incognito generalization algorithm for k-anonymity.
 
     :param table: dataframe with the data under study.
@@ -94,27 +100,38 @@ def incognito(table: pd.DataFrame, hierarchies: dict, k: int, qi: typing.Union[t
         current_node = lattice[current_lv][iter_in_lv]
 
         if current_node not in traversed_nodes:
-
             new_table = generalize(copy.deepcopy(table), current_node, hierarchies)
 
             if k == pycanon.anonymity.k_anonymity(new_table, qi):
                 # TODO Dejar al usuario elegir
-                possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [current_node, False]
+                possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [
+                    current_node,
+                    False,
+                ]
 
             elif pycanon.anonymity.k_anonymity(new_table, qi) <= supp_threshold:
                 equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
                 len_ec = [len(ec) for ec in equiv_class]
                 if k > max(len_ec):
-                    print(f'The anonymization cannot be carried out for the given value k={k} only by suppression')
+                    print(
+                        f"The anonymization cannot be carried out for the given value k={k} only by suppression"
+                    )
                 else:
-                    data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
+                    data_ec = pd.DataFrame({"equiv_class": equiv_class, "k": len_ec})
                     data_ec_k = data_ec[data_ec.k < k]
-                    ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
-                                              for ec in data_ec_k.equiv_class.values])
+                    ec_elim = np.concatenate(
+                        [
+                            anonymity.utils.aux_functions.convert(ec)
+                            for ec in data_ec_k.equiv_class.values
+                        ]
+                    )
                     new_table = table.drop(ec_elim).reset_index()
-                    assert (anonymity.k_anonymity(new_table, qi) >= k)
+                    assert anonymity.k_anonymity(new_table, qi) >= k
 
-                    possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [current_node, True]
+                    possible_nodes[dat_ut.discernibility(table, new_table, qi)] = [
+                        current_node,
+                        True,
+                    ]
 
         traversed_nodes.append(current_node)
 
@@ -133,13 +150,18 @@ def incognito(table: pd.DataFrame, hierarchies: dict, k: int, qi: typing.Union[t
             node = possible_nodes[i]
 
     if node[1] is True:
-        equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(generalize(table, node[0], hierarchies), qi)
+        equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(
+            generalize(table, node[0], hierarchies), qi
+        )
         len_ec = [len(ec) for ec in equiv_class]
-        data_ec = pd.DataFrame({'equiv_class': equiv_class, 'k': len_ec})
+        data_ec = pd.DataFrame({"equiv_class": equiv_class, "k": len_ec})
         data_ec_k = data_ec[data_ec.k < k]
-        ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
-                                  for ec in data_ec_k.equiv_class.values])
+        ec_elim = np.concatenate(
+            [
+                anonymity.utils.aux_functions.convert(ec)
+                for ec in data_ec_k.equiv_class.values
+            ]
+        )
         return table.drop(ec_elim).reset_index()
 
     return generalize(table, node[0], hierarchies)
-

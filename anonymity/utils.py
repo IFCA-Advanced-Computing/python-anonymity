@@ -25,8 +25,8 @@ def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
 
 
 def suppress_identifiers(
-        table: pd.DataFrame,
-        ident: typing.Union[typing.List, np.ndarray]) -> pd.DataFrame:
+    table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray]
+) -> pd.DataFrame:
     """Removes all the identifiers in the database.
 
     :param table: dataframe with the data under study.
@@ -41,11 +41,13 @@ def suppress_identifiers(
     """
 
     for i in ident:
-        table[i] = '*'
+        table[i] = "*"
     return table
 
 
-def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+def string_to_interval(
+    column: typing.Union[typing.List, np.ndarray]
+) -> typing.Union[typing.List, np.ndarray]:
     """Converts a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
@@ -66,9 +68,9 @@ def string_to_interval(column: typing.Union[typing.List, np.ndarray]) -> typing.
 
         aux = aux.replace(")", "")
         aux_2 = aux.split(",")
-        new_col.append(pd.Interval(left=float(aux_2[0]),
-                                   right=float(aux_2[1]),
-                                   closed='left'))
+        new_col.append(
+            pd.Interval(left=float(aux_2[0]), right=float(aux_2[1]), closed="left")
+        )
 
     column = new_col
     return column
@@ -83,9 +85,12 @@ def create_ranges(data, range_step):
         for j in range(1, len(range_step[i])):
             aux = range_step[i][j]
             # Generalization of numbers
-            if (isinstance(table[i][0], int) or isinstance(table[i][0], np.int64) or isinstance(table[i][0], float) or
-                    isinstance(table[i][0], complex)):
-
+            if (
+                isinstance(table[i][0], int)
+                or isinstance(table[i][0], np.int64)
+                or isinstance(table[i][0], float)
+                or isinstance(table[i][0], complex)
+            ):
                 min_range = np.inf
                 max_range = 0
 
@@ -110,9 +115,13 @@ def create_ranges(data, range_step):
                 ranges = []
 
                 for k in range(0, step):
-                    ranges.append(pd.Interval(left=(min_range + aux * k),
-                                              right=(min_range + aux * (k + 1)),
-                                              closed='left'))
+                    ranges.append(
+                        pd.Interval(
+                            left=(min_range + aux * k),
+                            right=(min_range + aux * (k + 1)),
+                            closed="left",
+                        )
+                    )
 
                 new_col = []
 
@@ -152,9 +161,13 @@ def create_ranges(data, range_step):
                 step = int((max_range - min_range) / aux)
                 ranges = []
                 for m in range(0, step):
-                    ranges.append(pd.Interval(left=(min_range + aux * m),
-                                              right=(min_range + aux * (m + 1)),
-                                              closed='left'))
+                    ranges.append(
+                        pd.Interval(
+                            left=(min_range + aux * m),
+                            right=(min_range + aux * (m + 1)),
+                            closed="left",
+                        )
+                    )
 
                 for m in range(0, len(new_hie[i])):
                     for n in ranges:
@@ -174,11 +187,12 @@ def create_ranges(data, range_step):
         return new_hie
 
 
-def generalization(column: typing.Union[typing.List, np.ndarray],
-                   hierarchies: dict,
-                   gen_level: int, name: str
-                   ) -> typing.Union[typing.List, np.ndarray, None]:
-
+def generalization(
+    column: typing.Union[typing.List, np.ndarray],
+    hierarchies: dict,
+    gen_level: int,
+    name: str,
+) -> typing.Union[typing.List, np.ndarray, None]:
     """Generalizes a column based on its data type.
 
     :param column: column from the table under study that needs to be generalized.
@@ -253,4 +267,3 @@ def generalization(column: typing.Union[typing.List, np.ndarray],
         column = new_col
 
     return column
-

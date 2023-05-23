@@ -8,7 +8,7 @@ LEVEL_GEN = {}
 
 
 def start_level():
-    """ Resets the global variable which contains the generalization
+    """Resets the global variable which contains the generalization
     levels of each parameter of the table of the function which is
     being monitored."""
 
@@ -17,7 +17,7 @@ def start_level():
 
 
 def get_level_generalization(name: str, level: int):
-    """ Updates the global variable which contains the generalization
+    """Updates the global variable which contains the generalization
     levels of each parameter of the table of the function which is being monitored.
 
     :param name: Name of the column which level we want to save
@@ -32,7 +32,7 @@ def get_level_generalization(name: str, level: int):
 
 
 def string_to_interval(
-        column: typing.Union[typing.List, np.ndarray]
+    column: typing.Union[typing.List, np.ndarray]
 ) -> typing.Union[typing.List, np.ndarray]:
     """Converts a string interval to an actual interval type,
     to facilitate the comparison of each data.
@@ -51,9 +51,9 @@ def string_to_interval(
 
         aux = aux.replace(")", "")
         aux_2 = aux.split(",")
-        new_col.append(pd.Interval(left=float(aux_2[0]),
-                                   right=float(aux_2[1]),
-                                   closed='left'))
+        new_col.append(
+            pd.Interval(left=float(aux_2[0]), right=float(aux_2[1]), closed="left")
+        )
 
         return new_col[0]
 
@@ -63,16 +63,16 @@ def string_to_interval(
 
         aux = aux.replace(")", "")
         aux_2 = aux.split(",")
-        new_col.append(pd.Interval(left=float(aux_2[0]),
-                                   right=float(aux_2[1]),
-                                   closed='left'))
+        new_col.append(
+            pd.Interval(left=float(aux_2[0]), right=float(aux_2[1]), closed="left")
+        )
 
     column = new_col
     return column
 
 
 def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
-    """ Creates the auxiliary hierarchies to facilitate the measuring of the
+    """Creates the auxiliary hierarchies to facilitate the measuring of the
     information loss function.
 
     :param hierarchy: hierarchies for generalization of string columns.
@@ -159,8 +159,11 @@ def generalized_information_loss(
 
 
 # TODO discernibility pero me pasan K
-def discernibility(og_table: pd.DataFrame, new_table: pd.DataFrame,
-                   qi: typing.Union[typing.List, np.ndarray]) -> float:
+def discernibility(
+    og_table: pd.DataFrame,
+    new_table: pd.DataFrame,
+    qi: typing.Union[typing.List, np.ndarray],
+) -> float:
     """Measures how indistinguishable a record is from others, by assigning a
     penalty to each record, equal to the size of the EQ to which it belongs.
 
@@ -192,8 +195,11 @@ def discernibility(og_table: pd.DataFrame, new_table: pd.DataFrame,
     return a
 
 
-def avr_equiv_class_size(og_table: pd.DataFrame, new_table: pd.DataFrame,
-                         qi: typing.Union[typing.List, np.ndarray]) -> float:
+def avr_equiv_class_size(
+    og_table: pd.DataFrame,
+    new_table: pd.DataFrame,
+    qi: typing.Union[typing.List, np.ndarray],
+) -> float:
     """Measures how well the creation of the EQs approaches the best case, where each record
     is generalized in an EQ of k records.
 

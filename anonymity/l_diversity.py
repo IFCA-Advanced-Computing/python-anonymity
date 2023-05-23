@@ -3,12 +3,15 @@ import typing
 import numpy as np
 import pandas as pd
 from pycanon import anonymity
-from data_fly import data_fly
-from incognito import incognito
+from anonymity.data_fly import data_fly
+from anonymity.incognito import incognito
 
 
-def get_diversities(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                    qi: typing.Union[typing.List, np.ndarray]) -> typing.Union[typing.List, np.ndarray]:
+def get_diversities(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+) -> typing.Union[typing.List, np.ndarray]:
     # Nos devuelve arrays con los indices de cada clase de equivalencia
     """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
 
@@ -34,8 +37,11 @@ def get_diversities(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarra
     return [equiv_sa, result]
 
 
-def get_l(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-          qi: typing.Union[typing.List, np.ndarray]) -> int:
+def get_l(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+) -> int:
     """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
 
     :param table: dataframe with the data under study.
@@ -79,7 +85,7 @@ def apply_l_diversity_supp(table: pd.DataFrame,
     else:
         supp_rate = 0
         while supp_rate <= supp_records:
-            data_ec = pd.DataFrame({'equiv_class': equiv_class, 'l': l_eq_c})
+            data_ec = pd.DataFrame({"equiv_class": equiv_class, "l": l_eq_c})
             data_ec_l = data_ec[data_ec.l_eq_c < l]
             ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
                                       for ec in data_ec_l.equiv_class.values])
@@ -108,10 +114,17 @@ def apply_l_diversity_qi(table: pd.DataFrame, sa: typing.Union[typing.List, np.n
 
 # La idea es que usando las funciones auxiliares de arriba esto devolviera una nueva tabla anonimizada
 # con una k superior.
-def apply_l_diversity(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                      qi: typing.Union[typing.List, np.ndarray], k_anon: str, l: int,
-                      ident: typing.Union[typing.List, np.ndarray], supp_threshold: int,
-                      hierarchies: dict, k: int) -> pd.DataFrame:
+def apply_l_diversity(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k_anon: str,
+    l: int,
+    ident: typing.Union[typing.List, np.ndarray],
+    supp_threshold: int,
+    hierarchies: dict,
+    k: int,
+) -> pd.DataFrame:
     """Apply l-diversity to an anonymized dataset.
 
     :param table: dataframe with the data under study.
