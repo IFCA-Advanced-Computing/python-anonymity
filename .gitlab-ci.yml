@@ -1,4 +1,5 @@
 stages:          # List of stages for jobs, and their order of execution
+  - lint
   - build
   - test
   - deploy
