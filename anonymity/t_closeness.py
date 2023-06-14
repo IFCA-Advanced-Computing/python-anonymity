@@ -41,14 +41,8 @@ def get_t(
         class_count = equiv_sa_tables[value]['crime'].value_counts()
         d = 0
         for j in equiv_sa[value]:
-            # print("TRY ", j)
-            # print("class_count[j] ", re.findall(r'\d+', str(class_count[j]))[0])
-            # print("total_count ", total_count)
             p = float(re.findall(r'\d+', str(class_count[j]))[0]) / total_count
-            # print("p ", p)
-            # print("global_freqs[j[0]] ", global_freqs[j[0]])
             d += abs(p - global_freqs[j[0]])
-            # print("d ", d)
         result[value] = d
 
     return result
@@ -149,7 +143,6 @@ def t_closeness_supp(table: pd.DataFrame,
         print(f"t_closeness is satisfied with t={t_real}")
         return table
 
-    equiv_class = pc.utils.aux_anonymity.get_equiv_class(table, qi)
     t_eq_c = get_t(table, sa, qi)
 
     if t > max(t_eq_c.values()):

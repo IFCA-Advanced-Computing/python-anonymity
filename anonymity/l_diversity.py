@@ -71,6 +71,12 @@ def apply_l_diversity_supp(table: pd.DataFrame,
     total_percent = len(table)
     supp_records = round(total_percent * (supp_lim / 100))
     l_real = anonymity.l_diversity(table, qi, sa)
+
+    if len(table[sa].value_counts()) < l:
+        print("l-diversity cannot be satisfied only with row suppression, "
+              "due to l being bigger than the unique values of the SA column")
+        return table
+
     if l_real >= l:
         print(f"l-diversity is satisfied with l={l_real}")
         return table
