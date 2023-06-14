@@ -76,7 +76,7 @@ def string_to_interval(
     return column
 
 
-# TODO Devuelve tanto la jerarquia nueva como los rangos creados
+# Devuelve tanto la jerarquia nueva como los rangos creados
 def create_ranges(data, range_step):
     table = copy.deepcopy(data)
     new_hie = {}

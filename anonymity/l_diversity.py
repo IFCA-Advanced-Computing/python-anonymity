@@ -68,10 +68,10 @@ def apply_l_diversity_supp(table: pd.DataFrame,
                            qi: typing.Union[typing.List, np.ndarray],
                            l: int,
                            supp_lim: float = 1) -> pd.DataFrame:
-    total_percent = len(table[0])
+    total_percent = len(table)
     supp_records = round(total_percent * (supp_lim / 100))
     l_real = anonymity.l_diversity(table, qi, sa)
-    if l_real < l:
+    if l_real >= l:
         print(f"l-diversity is satisfied with l={l_real}")
         return table
 
@@ -84,32 +84,24 @@ def apply_l_diversity_supp(table: pd.DataFrame,
 
     else:
         supp_rate = 0
+        print("supp_records ", supp_records)
         while supp_rate <= supp_records:
             data_ec = pd.DataFrame({"equiv_class": equiv_class, "l": l_eq_c})
-            data_ec_l = data_ec[data_ec.l_eq_c < l]
+            data_ec_l = data_ec[data_ec.l > l]
+
             ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
                                       for ec in data_ec_l.equiv_class.values])
-            table_new = table.drop(ec_elim).reset_index()
+            print(ec_elim)
+            table_new = table.drop(ec_elim[0]).reset_index()
+            print(table_new)
             supp_rate = (len(table) - len(table_new)) / len(table)
             if supp_rate > supp_records:
                 print(f"l-diversity cannot be satisfied by deleting less than "
                       f"{supp_records}% of the records.")
                 return table
-            else:
-                assert anonymity.l_diversity(table_new, qi, sa) >= l
-                return table_new
 
-
-# TODO Suprimir por columnas, ordenar QI por importancia
-def apply_l_diversity_qi(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                         qi: typing.Union[typing.List, np.ndarray], l: int) -> pd.DataFrame:
-    if get_l(table, qi, sa) < l:
-        print("l-diversity satisfied")
-        return table
-
-    for i in qi:
-        new_table = table.copy()
-        # TODO esto no es similar al de abajo?
+        assert anonymity.l_diversity(table_new, qi, sa) >= l
+        return table_new
 
 
 # La idea es que usando las funciones auxiliares de arriba esto devolviera una nueva tabla anonimizada
