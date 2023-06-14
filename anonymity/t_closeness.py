@@ -8,11 +8,11 @@ from anonymity.data_fly import data_fly
 from anonymity.incognito import incognito
 
 
-def get_t(
-        table: pd.DataFrame,
-        sa: typing.Union[typing.List, np.ndarray],
-        qi: typing.Union[typing.List, np.ndarray],
-) -> typing.Union[typing.List, np.ndarray]:
+def get_t(table: pd.DataFrame,
+          sa: typing.Union[typing.List, np.ndarray],
+          qi: typing.Union[typing.List, np.ndarray]
+          ) -> typing.Union[typing.List, np.ndarray]:
+
     equiv_class = pc.utils.aux_anonymity.get_equiv_class(table, qi)
 
     global_freqs = {}
@@ -41,29 +41,22 @@ def get_t(
         class_count = equiv_sa_tables[value]['crime'].value_counts()
         d = 0
         for j in equiv_sa[value]:
-<<<<<<< HEAD
             p = float(re.findall(r'\d+', str(class_count[j]))[0]) / total_count
             d += abs(p - global_freqs[j[0]])
-=======
-            # print("TRY ", j)
-            # print("class_count[j] ", re.findall(r'\d+', str(class_count[j]))[0])
-            # print("total_count ", total_count)
+
             p = float(re.findall(r'\d+', str(class_count[j]))[0]) / total_count
-            # print("p ", p)
-            # print("global_freqs[j[0]] ", global_freqs[j[0]])
+
             d += abs(p - global_freqs[j[0]])
-            # print("d ", d)
->>>>>>> afd85cb56f061097a189684aa148de2461489da4
         result[value] = d
 
     return result
 
 
-def get_t_old(
-        table: pd.DataFrame,
-        sa: typing.Union[typing.List, np.ndarray],
-        qi: typing.Union[typing.List, np.ndarray],
-) -> typing.Union[typing.List, np.ndarray]:
+def get_t_old(table: pd.DataFrame,
+              sa: typing.Union[typing.List, np.ndarray],
+              qi: typing.Union[typing.List, np.ndarray]
+              ) -> typing.Union[typing.List, np.ndarray]:
+
     equiv_class = pc.utils.aux_anonymity.get_equiv_class(table, qi)
 
     equiv_sa = {}
@@ -154,10 +147,6 @@ def t_closeness_supp(table: pd.DataFrame,
         print(f"t_closeness is satisfied with t={t_real}")
         return table
 
-<<<<<<< HEAD
-=======
-    equiv_class = pc.utils.aux_anonymity.get_equiv_class(table, qi)
->>>>>>> afd85cb56f061097a189684aa148de2461489da4
     t_eq_c = get_t(table, sa, qi)
 
     if t > max(t_eq_c.values()):
