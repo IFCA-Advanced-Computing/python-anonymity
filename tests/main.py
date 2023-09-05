@@ -1,11 +1,12 @@
 import copy
-from anonymity import incognito, utils
+from anonymity import utils_k_anonymity
+from anonymity._k_anonymity import incognito
 import pandas as pd
-from anonymity import data_fly as df
+from anonymity._k_anonymity import data_fly as df
 from pycanon import anonymity
 from anonymity.metrics import data_utility_metrics as dum
-from anonymity.l_diversity import apply_l_diversity, apply_l_diversity_multiple_sa, apply_l_diversity_supp
-from anonymity.t_closeness import t_closeness, t_closeness_supp
+from anonymity._l_diversity import apply_l_diversity, apply_l_diversity_multiple_sa, apply_l_diversity_supp
+from anonymity._t_closeness import t_closeness, t_closeness_supp
 
 file_name = "data/hospital_extended.csv"
 ID = ["name", "religion"]

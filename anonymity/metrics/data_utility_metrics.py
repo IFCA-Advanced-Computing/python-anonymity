@@ -189,9 +189,6 @@ def discernibility(
     for i in eq:
         if len(i) >= k:
             a = a + pow(len(i), 2)
-        else:
-            a = a + t * len(i)
-
     return a
 
 
