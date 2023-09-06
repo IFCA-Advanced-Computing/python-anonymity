@@ -1,6 +1,6 @@
 import copy
 import typing
-from anonymity import utils_k_anonymity as ut
+from anonymity.tools.utils_k_anon import utils_k_anonymity as ut
 import numpy as np
 import pandas as pd
 import pycanon.anonymity
@@ -44,7 +44,6 @@ def data_fly(
     :rtype: pandas dataframe
     """
 
-    # TODO Metrics
     em.start_monitor_time()
     em.monitor_cost_init("data_fly")
     em.monitor_memory_consumption_start()
@@ -87,7 +86,6 @@ def data_fly(
                 table_new = table.drop(ec_elim).reset_index()
                 assert anonymity.k_anonymity(table_new, qi) >= k
 
-                # TODO Metrics
                 em.end_monitor_time()
                 em.monitor_cost("data_fly")
                 em.monitor_memory_consumption_stop()
@@ -96,13 +94,13 @@ def data_fly(
 
         # Calculate the attribute with more unique values
         if len(qi_aux) == 0:
-            print(f'The anonymization cannot be carried out for '
-                      f'the given value k={k}')
+            print(
+                f"The anonymization cannot be carried out for " f"the given value k={k}"
+            )
             return table
         occurrences_qi = [len(np.unique(table[i])) for i in qi_aux]
         name = qi_aux[np.argmax(occurrences_qi)]
 
-        # TODO Metrics
         em.monitor_cost_add("datafly")
         new_ind = ut.generalization(
             table[name].values.tolist(), hierarchies, current_gen_level[name] + 1, name
@@ -120,7 +118,6 @@ def data_fly(
         dat_ut.get_level_generalization(name, current_gen_level[name])
         # print(table)
 
-    # TODO Metrics
     em.end_monitor_time()
     em.monitor_cost("datafly")
     em.monitor_memory_consumption_stop()
@@ -231,7 +228,8 @@ def incognito(
                 len_ec = [len(ec) for ec in equiv_class]
                 if k > max(len_ec):
                     print(
-                        f"The anonymization cannot be carried out for the given value k={k} only by suppression"
+                        f"The anonymization cannot be carried out for "
+                        f"the given value k={k} only by suppression"
                     )
                 else:
                     data_ec = pd.DataFrame({"equiv_class": equiv_class, "k": len_ec})
@@ -291,10 +289,12 @@ def k_anonymity(
     qi: typing.Union[typing.List, np.ndarray],
     supp_threshold: int,
     ident: typing.Union[typing.List, np.ndarray],
-    method: str
+    method: str,
 ) -> pd.DataFrame:
-
-    if method == "Incognito" or method == "incognito":
+    if method.lower() == "incognito":
         return incognito(table, hierarchies, k, qi, supp_threshold, ident)
-    else:
+    elif method.lower() == "datafly" or method.lower() == "data fly":
         return data_fly(table, hierarchies, k, qi, supp_threshold, ident)
+    else:
+        raise ValueError("Unimplemented k-anonymity method.")
+

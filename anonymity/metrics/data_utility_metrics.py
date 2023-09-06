@@ -91,7 +91,7 @@ def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
     occurancies of each element on both the original table and the anonymized table.
     :rtype: array of dictionaries
     """
-
+    
     vgh = {}
     numb_vgh = {}
 
@@ -112,10 +112,11 @@ def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
 
 
 def generalized_information_loss(
-        hierarchy: dict,
-        og_table: pd.DataFrame,
-        new_table: pd.DataFrame,
-        qi: typing.Union[typing.List, np.ndarray]) -> float:
+    hierarchy: dict,
+    og_table: pd.DataFrame,
+    new_table: pd.DataFrame,
+    qi: typing.Union[typing.List, np.ndarray],
+) -> float:
     """Captures the penalty incurred when generalizing a table, by quantifying the
     fraction of the domain values that have been generalized for each specific attribute.
 
@@ -138,6 +139,7 @@ def generalized_information_loss(
     :return: The penalty incurred when generalizing a table.
     :rtype: float
     """
+    
     vgh_aux = create_vgh(hierarchy)
     vgh = vgh_aux[0]
     numb_vgh = vgh_aux[1]
@@ -158,7 +160,6 @@ def generalized_information_loss(
     return (1 / (t * n)) * d
 
 
-# TODO discernibility pero me pasan K
 def discernibility(
     og_table: pd.DataFrame,
     new_table: pd.DataFrame,
@@ -218,3 +219,4 @@ def avr_equiv_class_size(
     k = anonymity.k_anonymity(new_table, qi)
     eq = anonymity.utils.aux_anonymity.get_equiv_class(new_table, qi)
     return t / (len(eq) * k)
+

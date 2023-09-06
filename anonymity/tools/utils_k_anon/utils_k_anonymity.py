@@ -239,7 +239,7 @@ def generalization(
         column = new_col
 
     # Generalization of strings
-    elif isinstance(column[0], str) and '[' not in column[0]:
+    elif isinstance(column[0], str) and "[" not in column[0]:
         # print("STRING")
         for i in range(len(column)):
             for j in range(len(aux)):
@@ -249,7 +249,6 @@ def generalization(
 
     # Generalization of ranges
     else:
-        # print("RANGE")
         column = string_to_interval(column)
         aux_col = []
         for i in range(len(aux)):

@@ -3,8 +3,8 @@ import typing
 import numpy as np
 import pandas as pd
 from pycanon import anonymity
-from anonymity._k_anonymity import data_fly
-from anonymity._k_anonymity import incognito
+from anonymity.tools._k_anonymity import data_fly
+from anonymity.tools._k_anonymity import incognito
 
 
 def get_diversities(
@@ -13,7 +13,8 @@ def get_diversities(
     qi: typing.Union[typing.List, np.ndarray],
 ) -> typing.Union[typing.List, np.ndarray]:
     # Nos devuelve arrays con los indices de cada clase de equivalencia
-    """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
+    """Return the l-diversity value as an integer. Calls the get_diversities and extract the
+    minimum l-diversity level.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe
@@ -22,8 +23,8 @@ def get_diversities(
         that are sensitive attributes.
     :type sa: list of strings
 
-    :param qi: list which contains a list of arrays which represent each equivalence class and a list with
-    the l-diversity value for each of those classes.
+    :param qi: list which contains a list of arrays which represent each equivalence
+    class and a list with the l-diversity value for each of those classes.
     :type qi: list of arrays
     """
     equiv_class = anonymity.utils.aux_anonymity.get_equiv_class(table, qi)
@@ -33,7 +34,7 @@ def get_diversities(
         tmp = table.iloc[ec]
         equiv_sa.append(tmp[sa].values)
 
-    result = [len(np.unique(ec_sa)) for ec_sa in equiv_sa]  # Numero de valores del SA distintos en cada EC
+    result = [len(np.unique(ec_sa)) for ec_sa in equiv_sa]
     return [equiv_sa, result]
 
 
@@ -42,7 +43,8 @@ def get_l(
     sa: typing.Union[typing.List, np.ndarray],
     qi: typing.Union[typing.List, np.ndarray],
 ) -> int:
-    """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
+    """Return the l-diversity value as an integer.
+    Calls the get_diversities and extract the minimum l-diversity level.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe
@@ -62,19 +64,22 @@ def get_l(
     return min(get_diversities(table, qi, sa)[1])
 
 
-# Version en la que el usuario nos meta el % de registros que permite suprimir
-def apply_l_diversity_supp(table: pd.DataFrame,
-                           sa: typing.Union[typing.List, np.ndarray],
-                           qi: typing.Union[typing.List, np.ndarray],
-                           l: int,
-                           supp_lim: float = 1) -> pd.DataFrame:
+def apply_l_diversity_supp(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    l: int,
+    supp_lim: float = 1,
+) -> pd.DataFrame:
     total_percent = len(table)
     supp_records = round(total_percent * (supp_lim / 100))
     l_real = anonymity.l_diversity(table, qi, sa)
 
     if len(table[sa].value_counts()) < l:
-        print("l-diversity cannot be satisfied only with row suppression, "
-              "due to l being bigger than the unique values of the SA column")
+        print(
+            "l-diversity cannot be satisfied only with row suppression, "
+            "due to l being bigger than the unique values of the SA column"
+        )
         return table
 
     if l_real >= l:
@@ -95,15 +100,21 @@ def apply_l_diversity_supp(table: pd.DataFrame,
             data_ec = pd.DataFrame({"equiv_class": equiv_class, "l": l_eq_c})
             data_ec_l = data_ec[data_ec.l > l]
 
-            ec_elim = np.concatenate([anonymity.utils.aux_functions.convert(ec)
-                                      for ec in data_ec_l.equiv_class.values])
+            ec_elim = np.concatenate(
+                [
+                    anonymity.utils.aux_functions.convert(ec)
+                    for ec in data_ec_l.equiv_class.values
+                ]
+            )
             print(ec_elim)
             table_new = table.drop(ec_elim[0]).reset_index()
             print(table_new)
             supp_rate = (len(table) - len(table_new)) / len(table)
             if supp_rate > supp_records:
-                print(f"l-diversity cannot be satisfied by deleting less than "
-                      f"{supp_records}% of the records.")
+                print(
+                    f"l-diversity cannot be satisfied by deleting less than "
+                    f"{supp_records}% of the records."
+                )
                 return table
 
         assert anonymity.l_diversity(table_new, qi, sa) >= l
@@ -116,7 +127,7 @@ def apply_l_diversity(
     table: pd.DataFrame,
     sa: typing.Union[typing.List, np.ndarray],
     qi: typing.Union[typing.List, np.ndarray],
-    k_anon: str,
+    k_method: str,
     l: int,
     ident: typing.Union[typing.List, np.ndarray],
     supp_threshold: int,
@@ -143,8 +154,8 @@ def apply_l_diversity(
     :param k: desired level of k-anonymity.
     :type k: int
 
-    :param k_anon: desired algorithm for anonymization.
-    :type k_anon: string
+    :param k_method: desired algorithm for anonymization.
+    :type k_method: string
 
     :param l: desired level of l-diversity.
     :type l: int
@@ -162,18 +173,13 @@ def apply_l_diversity(
     print(l)
     print(get_l(table, qi, sa))
     while get_l(table, qi, sa) < l and count < 50:
-
-        if k_anon == "data_fly":
+        if k_method == "data_fly":
             k = k + 1
-            table = data_fly(table, ident,
-                             qi, k, supp_threshold,
-                             hierarchies)
+            table = data_fly(table, ident, qi, k, supp_threshold, hierarchies)
 
         else:
             k = k + 1
-            table = incognito(table, hierarchies,
-                              k, qi, supp_threshold,
-                              ident)
+            table = incognito(table, hierarchies, k, qi, supp_threshold, ident)
         count += 1
 
     if count >= 50:
@@ -185,10 +191,17 @@ def apply_l_diversity(
         return [get_l(table, qi, sa), table, True]
 
 
-def apply_l_diversity_multiple_sa(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                                  qi: typing.Union[typing.List, np.ndarray], k_anon: str, l: int,
-                                  ident: typing.Union[typing.List, np.ndarray], supp_threshold: int,
-                                  hierarchies: dict, k: int) -> pd.DataFrame:
+def apply_l_diversity_multiple_sa(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k_method: str,
+    l: int,
+    ident: typing.Union[typing.List, np.ndarray],
+    supp_threshold: int,
+    hierarchies: dict,
+    k: int,
+) -> pd.DataFrame:
     """Apply l-diversity to an anonymized dataset.
 
     :param table: dataframe with the data under study.
@@ -209,8 +222,8 @@ def apply_l_diversity_multiple_sa(table: pd.DataFrame, sa: typing.Union[typing.L
     :param k: desired level of k-anonymity.
     :type k: int
 
-    :param k_anon: desired algorithm for anonymization.
-    :type k_anon: string
+    :param k_method: desired algorithm for anonymization.
+    :type k_method: string
 
     :param l: desired level of l-diversity.
     :type l: int
@@ -234,11 +247,21 @@ def apply_l_diversity_multiple_sa(table: pd.DataFrame, sa: typing.Union[typing.L
     l_div = []
     new_hierarchies = copy.deepcopy(hierarchies)
     while count < limit:
-        new_qi = qi + sa[:count] + sa[count + 1:]
+        new_qi = qi + sa[:count] + sa[count + 1 :]
         print(new_qi)
         new_sa = sa[count]
 
-        result = apply_l_diversity(new_table, new_sa, new_qi, k_anon, l, ident, supp_threshold, new_hierarchies, k)
+        result = apply_l_diversity(
+            new_table,
+            new_sa,
+            new_qi,
+            k_method,
+            l,
+            ident,
+            supp_threshold,
+            new_hierarchies,
+            k,
+        )
 
         if not result[2]:
             print("l-diversity not satisfied for ", sa[count:])
@@ -249,3 +272,24 @@ def apply_l_diversity_multiple_sa(table: pd.DataFrame, sa: typing.Union[typing.L
         count += 1
 
     return [l_div, new_table]
+
+
+def l_diversity(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k_method: str,
+    l: int,
+    ident: typing.Union[typing.List, np.ndarray],
+    supp_threshold: int,
+    hierarchies: dict,
+    k: int,
+) -> pd.DataFrame:
+    if len(sa > 1):
+        return apply_l_diversity_multiple_sa(
+            table, sa, qi, k_method, l, ident, supp_threshold, hierarchies, k
+        )
+    else:
+        return apply_l_diversity(
+            table, sa, qi, k_method, l, ident, supp_threshold, hierarchies, k
+        )
