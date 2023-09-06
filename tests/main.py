@@ -1,10 +1,16 @@
 import copy
-from anonymity import incognito, utils
+from anonymity import utils_k_anonymity
+from anonymity._k_anonymity import incognito
 import pandas as pd
-from anonymity import data_fly as df
+from anonymity._k_anonymity import data_fly as df
 from pycanon import anonymity
 from anonymity.metrics import data_utility_metrics as dum
-from anonymity.l_diversity import apply_l_diversity_v2
+from anonymity._l_diversity import (
+    apply_l_diversity,
+    apply_l_diversity_multiple_sa,
+    apply_l_diversity_supp,
+)
+from anonymity._t_closeness import t_closeness, t_closeness_supp
 
 file_name = "data/hospital_extended.csv"
 ID = ["name", "religion"]
@@ -84,7 +90,7 @@ mix_hierarchy = dict(
     hierarchy, **utils.create_ranges(copy.deepcopy(data), age_hierarchy)
 )
 print("DATA-FLY")
-new_data = df.data_fly(data, ID, copy.copy(QI), 5, 0, mix_hierarchy)
+new_data = df.data_fly(data, ID, copy.copy(QI), 5, 2, mix_hierarchy)
 print("\n", new_data)
 print(f"QI: {QI}")
 print("\n", "K-anonymity: ", anonymity.k_anonymity(new_data, QI))
@@ -100,6 +106,7 @@ print(
 
 # TODO La metrica de GIL no va bien, ya que sale el mismo resultado en ambos casos
 new_data = incognito.incognito(data, mix_hierarchy, 3, copy.copy(QI), 0, ID)
+new_data_2 = copy.deepcopy(new_data)
 print("RAW DATA")
 print("\n", data)
 print("INCOGNITO")
@@ -126,4 +133,11 @@ sa_hierarchy = {
         ["Indecency", "Non violent crime", "*"],
     ]
 }
-print(apply_l_diversity_v2(new_data, SA, QI, "data_fly", 2, ID, sa_hierarchy))
+
+print(apply_l_diversity_supp(new_data, SA, QI, 3, 50))
+# print(apply_l_diversity_multiple_sa(new_data, SA, QI, "data_fly", 2, ID, sa_hierarchy))
+
+print("######################################################")
+print("t-closeness")
+print(t_closeness(new_data_2, SA, QI, 0.47, "data_fly", ID, 1, sa_hierarchy))
+print(t_closeness_supp(new_data_2, SA, QI, 0.4, 1))
