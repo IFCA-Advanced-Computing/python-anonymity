@@ -7,8 +7,8 @@ import pycanon.anonymity as pc
 from pycanon.anonymity.utils import aux_functions
 from pycanon.anonymity.utils.aux_anonymity import get_equiv_class
 
-from anonymity.data_fly import data_fly
-from anonymity.incognito import incognito
+from anonymity.tools._k_anonymity import data_fly
+from anonymity.tools._k_anonymity import incognito
 
 
 def aux_t_closeness_num(
@@ -47,9 +47,11 @@ def aux_t_closeness_num(
 
 
 def aux_t_closeness_str(
-    data: pd.DataFrame, quasi_ident: typing.Union[list, np.ndarray], sens_att_value: list
+    data: pd.DataFrame,
+    quasi_ident: typing.Union[list, np.ndarray],
+    sens_att_value: list,
 ) -> float:
-    """Obtain t for for t-closeness.
+    """Obtain t for t-closeness.
     Function used for categorical attributes: the metric "Equal Distance" is
     used.
     :param data: dataframe with the data under study.
@@ -82,17 +84,17 @@ def aux_t_closeness_str(
 
 
 # TODO Añadir el if para elegir entre una de las 2 funciones de arriba segun el type_t
-def get_t(table: pd.DataFrame,
-          sa: typing.Union[typing.List, np.ndarray],
-          qi: typing.Union[typing.List, np.ndarray],
-          type_t: str
-          ) -> typing.Union[typing.List, np.ndarray]:
-
+def get_t(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    type_t: str,
+) -> typing.Union[typing.List, np.ndarray]:
     equiv_class = pc.utils.aux_anonymity.get_equiv_class(table, qi)
 
     global_freqs = {}
     total_count = float(len(table))
-    group_counts = table.groupby(sa)[sa].agg('count')
+    group_counts = table.groupby(sa)[sa].agg("count")
 
     for value, count in group_counts.to_dict().items():
         for i in count.keys():
@@ -113,13 +115,13 @@ def get_t(table: pd.DataFrame,
     class_count = {}
     for value in equiv_sa.keys():
         total_count = float(len(equiv_sa[value]))
-        class_count = equiv_sa_tables[value]['crime'].value_counts()
+        class_count = equiv_sa_tables[value]["crime"].value_counts()
         d = 0
         for j in equiv_sa[value]:
-            p = float(re.findall(r'\d+', str(class_count[j]))[0]) / total_count
+            p = float(re.findall(r"\d+", str(class_count[j]))[0]) / total_count
             d += abs(p - global_freqs[j[0]])
 
-            p = float(re.findall(r'\d+', str(class_count[j]))[0]) / total_count
+            p = float(re.findall(r"\d+", str(class_count[j]))[0]) / total_count
 
             d += abs(p - global_freqs[j[0]])
         result[value] = d
@@ -127,13 +129,18 @@ def get_t(table: pd.DataFrame,
     return result
 
 
-def t_closeness(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
-                qi: typing.Union[typing.List, np.ndarray], t: float, k_anon: str,
-                ident: typing.Union[typing.List, np.ndarray],
-                supp_threshold: int,
-                hierarchies: dict
-                ) -> pd.DataFrame:
-    """Return the l-diversity value as an integer. Calls the get_diversities and extract the minimum l-diversity level.
+def t_closeness(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    t: float,
+    k_method: str,
+    ident: typing.Union[typing.List, np.ndarray],
+    supp_threshold: int,
+    hierarchies: dict,
+) -> pd.DataFrame:
+    """Return the l-diversity value as an integer.
+    Calls the get_diversities and extract the minimum l-diversity level.
 
         :param table: dataframe with the data under study.
         :type table: pandas dataframe
@@ -151,7 +158,7 @@ def t_closeness(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
 
         :return: table that covers t-closeness.
         :rtype: pandas dataframe
-        """
+    """
 
     count = 0
     print(t)
@@ -164,18 +171,13 @@ def t_closeness(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
         type_t = "cat"
 
     while pc.t_closeness(table, qi, sa, type_t) > t and count < 50:
-
-        if k_anon == "data_fly":
+        if k_method == "data_fly":
             k = k + 1
-            table = data_fly(table, ident,
-                             qi, k, supp_threshold,
-                             hierarchies)
+            table = data_fly(table, ident, qi, k, supp_threshold, hierarchies)
 
         else:
             k = k + 1
-            table = incognito(table, hierarchies,
-                              k, qi, supp_threshold,
-                              ident)
+            table = incognito(table, hierarchies, k, qi, supp_threshold, ident)
         count += 1
 
     if count >= 50:
@@ -188,11 +190,13 @@ def t_closeness(table: pd.DataFrame, sa: typing.Union[typing.List, np.ndarray],
 
 
 # TODO Fijarme en la de l-diversity de pycanon para diferenciar entre letras y numeros en los qi
-def t_closeness_supp(table: pd.DataFrame,
-                     sa: typing.Union[typing.List, np.ndarray],
-                     qi: typing.Union[typing.List, np.ndarray],
-                     t: float,
-                     supp_lim: float = 1) -> pd.DataFrame:
+def t_closeness_supp(
+    table: pd.DataFrame,
+    sa: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    t: float,
+    supp_lim: float = 1,
+) -> pd.DataFrame:
     total_percent = len(table)
     supp_records = round(total_percent * (supp_lim / 100))
     t_real = pc.t_closeness(table, qi, sa)
@@ -212,14 +216,20 @@ def t_closeness_supp(table: pd.DataFrame,
             data_ec = pd.DataFrame({"equiv_class": t_eq_c.keys(), "t": t_eq_c.values()})
             data_ec_t = data_ec[data_ec.t > t]
             print(data_ec_t)
-            ec_elim = np.concatenate([pc.utils.aux_functions.convert(ec)
-                                      for ec in data_ec_t.equiv_class.values])
+            ec_elim = np.concatenate(
+                [
+                    pc.utils.aux_functions.convert(ec)
+                    for ec in data_ec_t.equiv_class.values
+                ]
+            )
             print(ec_elim)
             table_new = table.drop(ec_elim[0]).reset_index()
             supp_rate = (len(table) - len(table_new)) / len(table)
             if supp_rate > supp_records:
-                print(f"t-closeness cannot be satisfied by deleting less than "
-                      f"{supp_records}% of the records.")
+                print(
+                    f"t-closeness cannot be satisfied by deleting less than "
+                    f"{supp_records}% of the records."
+                )
                 return table
             else:
                 assert pc.t_closeness(table_new, qi, sa) >= t
