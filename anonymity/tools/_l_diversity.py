@@ -179,7 +179,7 @@ def apply_l_diversity(
 
         else:
             k = k + 1
-            table = incognito(table, hierarchies, k, qi, supp_threshold, ident)
+            table = incognito(table, ident, qi, k, supp_threshold, hierarchies)
         count += 1
 
     if count >= 50:
@@ -285,7 +285,7 @@ def l_diversity(
     hierarchies: dict,
     k: int,
 ) -> pd.DataFrame:
-    if len(sa > 1):
+    if len(sa) > 1:
         return apply_l_diversity_multiple_sa(
             table, sa, qi, k_method, l, ident, supp_threshold, hierarchies, k
         )
