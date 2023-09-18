@@ -2,12 +2,15 @@ import unittest
 import pandas as pd
 import pycanon
 from anonymity import tools
-from anonymity.metrics.data_utility_metrics import generalized_information_loss, discernibility, avr_equiv_class_size
+from anonymity.metrics.data_utility_metrics import (
+    generalized_information_loss,
+    discernibility,
+    avr_equiv_class_size,
+)
 from anonymity.tools.utils_k_anon import utils_k_anonymity as utils
 
 
 class UnitTest(unittest.TestCase):
-
     d = {
         "name": ["Joe", "Jill", "Sue", "Abe", "Bob", "Amy"],
         "marital stat": [
@@ -52,6 +55,7 @@ class UnitTest(unittest.TestCase):
     """ Tests the datafly function for an impossible k value for the given dataset. Doesn't use suppression.
         Ensure the k returned is smaller than the input k.
     """
+
     def test_datafly_higher_k_no_supp(self):
         k = 10
         supp_threshold = 0
@@ -68,6 +72,7 @@ class UnitTest(unittest.TestCase):
     """ Tests the datafly function for an impossible k value for the given dataset. Uses suppression.
         Ensure the k returned is smaller than the input k.
     """
+
     def test_datafly_higher_k_supp(self):
         k = 10
         supp_threshold = 2
@@ -84,6 +89,7 @@ class UnitTest(unittest.TestCase):
     """ Tests the datafly function for a real k value for the given dataset. Doesn't use suppression.
         Ensure the k returned is equal or greater than the input k.
     """
+
     def test_datafly_real_k_no_supp(self):
         k = 3
         supp_threshold = 0
@@ -100,6 +106,7 @@ class UnitTest(unittest.TestCase):
     """ Tests the datafly function for a real k value for the given dataset. Uses suppression.
         Ensure the k returned is equal or greater than the input k.
     """
+
     def test_datafly_real_k_supp(self):
         k = 3
         supp_threshold = 2
@@ -116,6 +123,7 @@ class UnitTest(unittest.TestCase):
     """ Tests the datafly function for a small k value for the given dataset. Doesn't use suppression.
         Ensure the k returned is equal or greater than the input k.
     """
+
     def test_datafly_small_k_no_supp(self):
         k = 2
         supp_threshold = 0
@@ -142,7 +150,7 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
-####
+    ####
 
     def test_incognito_higher_k_no_supp(self):
         k = 10
@@ -222,8 +230,7 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
-
-##################################################
+    ##################################################
 
     def test_l_diversity_higher_l_no_supp_datafly(self):
         k = 2
@@ -441,8 +448,7 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
-
-#####################################################
+    #####################################################
 
     def test_t_closeness_real_t_no_supp_datafly(self):
         supp_threshold = 0
@@ -461,7 +467,6 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
     def test_t_closeness_real_t_no_supp_incognito(self):
         supp_threshold = 0
         t = 0.7
@@ -478,7 +483,6 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
     def test_t_closeness_small_t_no_supp_datafly(self):
         supp_threshold = 0
         t = 0.9
@@ -494,7 +498,6 @@ class UnitTest(unittest.TestCase):
             self.mix_hierarchy,
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
-
 
     def test_t_closeness_small_t_no_supp_incognito(self):
         supp_threshold = 0
@@ -548,10 +551,7 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
-
-
-#####################################################
+    #####################################################
 
     # TODO Esto es Integration testing
     def test_l_diversity_datafly(self):
@@ -660,7 +660,6 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
     def test_t_closeness_supp(self):
         k = 3
         supp_threshold = 2
@@ -684,8 +683,7 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
-#####################################################################################
+    #####################################################################################
 
     def test_generalized_information_loss(self):
         k = 3
@@ -700,10 +698,7 @@ class UnitTest(unittest.TestCase):
         )
 
         inf_lost = generalized_information_loss(
-            self.mix_hierarchy,
-            self.data,
-            new_data,
-            self.QI
+            self.mix_hierarchy, self.data, new_data, self.QI
         )
 
         assert inf_lost > 0
@@ -720,10 +715,7 @@ class UnitTest(unittest.TestCase):
             self.mix_hierarchy,
         )
 
-        disc = discernibility(
-            self.data,
-            new_data,
-            self.QI)
+        disc = discernibility(self.data, new_data, self.QI)
 
         assert disc > 0
 
@@ -739,10 +731,7 @@ class UnitTest(unittest.TestCase):
             self.mix_hierarchy,
         )
 
-        avr = avr_equiv_class_size(
-            self.data,
-            new_data,
-            self.QI)
+        avr = avr_equiv_class_size(self.data, new_data, self.QI)
 
         assert avr > 0
 

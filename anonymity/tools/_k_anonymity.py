@@ -200,7 +200,7 @@ def incognito(
     :return: anonymized table.
     :rtype: pandas dataframe
     """
-    warnings.simplefilter('ignore', pd.errors.SettingWithCopyWarning)
+    warnings.simplefilter("ignore", pd.errors.SettingWithCopyWarning)
 
     lattice = generate_lattice(hierarchies)
     current_lv = 0  # To check if we have traversed all the lvs
@@ -305,4 +305,3 @@ def k_anonymity(
         return data_fly(table, hierarchies, k, qi, supp_threshold, ident)
     else:
         raise ValueError("Unimplemented k-anonymity method.")
-
