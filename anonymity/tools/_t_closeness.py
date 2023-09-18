@@ -198,12 +198,14 @@ def t_closeness_supp(
     supp_lim: float = 1,
 ) -> pd.DataFrame:
     total_percent = len(table)
-    supp_records = round(total_percent * (supp_lim / 100))
+    print(len(table))
+    supp_records = round(total_percent * supp_lim)
     t_real = pc.t_closeness(table, qi, sa)
     if t_real < t:
         print(f"t-closeness is satisfied with t={t_real}")
         return table
 
+    print(supp_records)
     type_t = "num"
 
     if isinstance(table[sa[0]][0], str):
@@ -223,12 +225,17 @@ def t_closeness_supp(
             print(data_ec_t)
             ec_elim = np.concatenate(
                 [
-                    pc.utils.aux_functions.convert(ec)
+                    pc.utils.aux_functions.convert(ec[2])
                     for ec in data_ec_t.equiv_class.values
                 ]
             )
+
+            # for ec in data_ec_t.equiv_class.values:
+                # print(pc.utils.aux_functions.convert(ec))
+
             print(ec_elim)
-            table_new = table.drop(ec_elim[0]).reset_index()
+            print(type(ec_elim[0]))
+            table_new = table.drop(int(ec_elim[0])).reset_index()
             supp_rate = (len(table) - len(table_new)) / len(table)
             if supp_rate > supp_records:
                 print(

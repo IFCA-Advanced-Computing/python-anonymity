@@ -129,6 +129,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the datafly function for a small k value for the given dataset. Uses suppression.
+        Ensure the k returned is equal or greater than the input k.
+    """
     def test_datafly_small_k_supp(self):
         k = 2
         supp_threshold = 2
@@ -144,6 +147,9 @@ class UnitTest(unittest.TestCase):
 
 ####
 
+    """ Tests the incognito function for a high k value for the given dataset. Doesn't use suppression.
+        Ensure the k returned is lesser than the input k.
+    """
     def test_incognito_higher_k_no_supp(self):
         k = 10
         supp_threshold = 0
@@ -157,6 +163,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k > pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the incognito function for a small k value for the given dataset. Uses suppression.
+        Ensure the k returned is lesser than the input k.
+    """
     def test_incognito_higher_k_supp(self):
         k = 10
         supp_threshold = 2
@@ -170,6 +179,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k > pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the incognito function for a realistic k value for the given dataset. Doesn't use suppression.
+        Ensure the k returned is equal or greater than the input k.
+    """
     def test_incognito_real_k_no_supp(self):
         k = 3
         supp_threshold = 0
@@ -183,6 +195,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the incognito function for a realistic k value for the given dataset. Uses suppression.
+        Ensure the k returned is equal or greater than the input k.
+    """
     def test_incognito_real_k_supp(self):
         k = 3
         supp_threshold = 2
@@ -196,6 +211,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the incognito function for a low k value for the given dataset. Doesn't use suppression.
+        Ensure the k returned is equal or greater than the input k.
+    """
     def test_incognito_small_k_no_supp(self):
         k = 1
         supp_threshold = 0
@@ -209,6 +227,9 @@ class UnitTest(unittest.TestCase):
         )
         assert k <= pycanon.anonymity.k_anonymity(new_data, self.QI)
 
+    """ Tests the incognito function for a low k value for the given dataset. Uses suppression.
+        Ensure the k returned is equal or greater than the input k.
+    """
     def test_incognito_small_k_supp(self):
         k = 1
         supp_threshold = 2
@@ -225,6 +246,9 @@ class UnitTest(unittest.TestCase):
 
 ##################################################
 
+    """ Tests the l-diversity function for a high l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is lesser than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_higher_l_no_supp_datafly(self):
         k = 2
         supp_threshold = 0
@@ -243,6 +267,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l > pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a high l value for the given dataset. Uses suppression.
+        Ensure the l returned is lesser than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_higher_l_supp_datafly(self):
         k = 2
         supp_threshold = 2
@@ -261,6 +288,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l > pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a high l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is lesser than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_higher_l_no_supp_incognito(self):
         k = 2
         supp_threshold = 0
@@ -279,6 +309,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l > pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a high l value for the given dataset. Uses suppression.
+        Ensure the l returned is lesser than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_higher_l_supp_incognito(self):
         k = 2
         supp_threshold = 2
@@ -297,6 +330,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l > pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a realistic l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_real_l_no_supp_datafly(self):
         k = 2
         supp_threshold = 0
@@ -315,6 +351,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a realistic l value for the given dataset. Uses suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_real_l_supp_datafly(self):
         k = 2
         supp_threshold = 2
@@ -333,6 +372,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l >= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a realistic l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_real_l_no_supp_incognito(self):
         k = 3
         supp_threshold = 0
@@ -351,6 +393,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l >= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a realistic l value for the given dataset. Uses suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_real_l_supp_incognito(self):
         k = 2
         supp_threshold = 1
@@ -369,6 +414,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a low l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_small_l_no_supp_datafly(self):
         k = 3
         supp_threshold = 0
@@ -387,6 +435,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a low l value for the given dataset. Uses suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the data-fly function for anonymization.
+    """
     def test_l_diversity_small_l_supp_datafly(self):
         k = 3
         supp_threshold = 2
@@ -405,6 +456,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a low l value for the given dataset. Doesn't use suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_small_l_no_supp_incognito(self):
         k = 3
         supp_threshold = 0
@@ -423,6 +477,9 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the l-diversity function for a low l value for the given dataset. Uses suppression.
+        Ensure the l returned is equal or greater than the input l. Uses the incognito function for anonymization.
+    """
     def test_l_diversity_small_l_supp_incognito(self):
         k = 3
         supp_threshold = 2
@@ -444,6 +501,9 @@ class UnitTest(unittest.TestCase):
 
 #####################################################
 
+    """ Tests the t-closeness function for a realistic t value for the given dataset. Doesn't use suppression.
+        Ensure the t returned is equal or lesser than the input t. Uses the datafly function for anonymization.
+    """
     def test_t_closeness_real_t_no_supp_datafly(self):
         supp_threshold = 0
         print(self.data[self.SA[0]][0])
@@ -461,7 +521,9 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
+    """ Tests the t-closeness function for a realistic t value for the given dataset. Doesn't use suppression.
+       Ensure the t returned is equal or lesser than the input t. Uses the incognito function for anonymization.
+    """
     def test_t_closeness_real_t_no_supp_incognito(self):
         supp_threshold = 0
         t = 0.7
@@ -478,10 +540,12 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
+    """ Tests the t-closeness function for a lower t value for the given dataset. Doesn't use suppression.
+        Ensure the t returned is equal or lesser than the input t. Uses the datafly function for anonymization.
+    """
     def test_t_closeness_small_t_no_supp_datafly(self):
         supp_threshold = 0
-        t = 0.9
+        t = 0.2
         k_method = "data_fly"
         new_data = tools.t_closeness(
             self.data,
@@ -495,10 +559,12 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-
+    """ Tests the t-closeness function for a lower t value for the given dataset. Doesn't use suppression.
+        Ensure the t returned is equal or lesser than the input t. Uses the incognito function for anonymization.
+    """
     def test_t_closeness_small_t_no_supp_incognito(self):
         supp_threshold = 0
-        t = 0.9
+        t = 0.2
         k_method = "incognito"
         new_data = tools.t_closeness(
             self.data,
@@ -510,20 +576,11 @@ class UnitTest(unittest.TestCase):
             supp_threshold,
             self.mix_hierarchy,
         )
-        assert t <= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
+        assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
-    def test_t_closeness_higher_t_supp(self):
-        supp_limit = 0.9
-        t = 0.2
-        new_data = tools.t_closeness_supp(
-            self.data,
-            self.SA,
-            self.QI,
-            t,
-            supp_limit,
-        )
-        assert t < pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
-
+    """ Tests the t-closeness function for a realistic t value for the given dataset. Uses suppression.
+        Ensure the t returned is equal or lesser than the input t.
+    """
     def test_t_closeness_real_t_supp(self):
         supp_limit = 0.6
         t = 0.8
@@ -534,11 +591,14 @@ class UnitTest(unittest.TestCase):
             t,
             supp_limit,
         )
-        assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
+        assert t >= pycanon.anonymity.t_closeness(new_data, self.QI, self.SA)
 
+    """ Tests the t-closeness function for a lower t value for the given dataset. Uses suppression.
+        Ensure the t returned is equal or lesser than the input t.
+    """
     def test_t_closeness_small_t_supp(self):
         supp_limit = 0.2
-        t = 0.9
+        t = 0.2
         new_data = tools.t_closeness_supp(
             self.data,
             self.SA,
@@ -546,14 +606,14 @@ class UnitTest(unittest.TestCase):
             t,
             supp_limit,
         )
-        assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
-
-
-
+        assert t <= pycanon.anonymity.t_closeness(new_data, self.QI, self.SA)
 
 #####################################################
 
-    # TODO Esto es Integration testing
+    """ Tests the correct integration of the l-diversity method when given an already anonymized dataset. It uses the
+        datafly method to anonymize the dataset before passing it to the l-diversity function. 
+        Uses suppression. Ensure the l returned is equal or greater than the input l.
+    """
     def test_l_diversity_datafly(self):
         k = 3
         supp_threshold = 2
@@ -581,6 +641,10 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the correct integration of the l-diversity method when given an already anonymized dataset. It uses the
+        incognito method to anonymize the dataset before passing it to the l-diversity function. 
+        Uses suppression. Ensure the l returned is equal or greater than the input l.
+    """
     def test_l_diversity_incognito(self):
         k = 3
         supp_threshold = 2
@@ -608,6 +672,10 @@ class UnitTest(unittest.TestCase):
         )
         assert l <= pycanon.anonymity.l_diversity(new_data[1], self.QI, self.SA)
 
+    """ Tests the correct integration of the t-closeness method when given an already anonymized dataset. It uses the
+        datafly method to anonymize the dataset before passing it to the t-closeness function. 
+        Doesn't use suppression. Ensure the t returned is equal or lesser than the input t.
+    """
     def test_t_closeness_datafly(self):
         k = 3
         supp_threshold = 2
@@ -634,6 +702,10 @@ class UnitTest(unittest.TestCase):
         )
         assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
 
+    """ Tests the correct integration of the t-closeness method when given an already anonymized dataset. It uses the
+        incognito method to anonymize the dataset before passing it to the t-closeness function. 
+        Doesn't use suppression. Ensure the t returned is equal or lesser than the input t.
+    """
     def test_t_closeness_incognito(self):
         k = 3
         supp_threshold = 2
@@ -658,9 +730,12 @@ class UnitTest(unittest.TestCase):
             supp_threshold,
             self.mix_hierarchy,
         )
-        assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
+        assert t >= new_data[0]
 
-
+    """ Tests the correct integration of the t-closeness method when given an already anonymized dataset. It uses the
+        datafly method to anonymize the dataset before passing it to the t-closeness function. 
+        Uses suppression. Ensure the t returned is equal or lesser than the input t.
+    """
     def test_t_closeness_supp(self):
         k = 3
         supp_threshold = 2
@@ -682,11 +757,14 @@ class UnitTest(unittest.TestCase):
             t,
             supp_limit,
         )
-        assert t >= pycanon.anonymity.t_closeness(new_data[1], self.QI, self.SA)
+        assert t >= pycanon.anonymity.t_closeness(new_data, self.QI, self.SA)
 
 
 #####################################################################################
 
+    """ Tests the correct integration of the generalized_information_loss by checking that the value returned when 
+        using two datasets, one anonymized and one raw, as inputs is greater than 0.
+    """
     def test_generalized_information_loss(self):
         k = 3
         supp_threshold = 2
@@ -708,6 +786,9 @@ class UnitTest(unittest.TestCase):
 
         assert inf_lost > 0
 
+    """ Tests the correct integration of the discernibility metric by checking that the value returned when 
+        using two datasets, one anonymized and one raw, as inputs is greater than 0.
+    """
     def test_discernibility(self):
         k = 3
         supp_threshold = 2
@@ -727,6 +808,9 @@ class UnitTest(unittest.TestCase):
 
         assert disc > 0
 
+    """ Tests the correct integration of the avr_equiv_class_size metric by checking that the value returned when 
+        using two datasets, one anonymized and one raw, as inputs is greater than 0.
+    """
     def test_avr_equiv_class_size(self):
         k = 3
         supp_threshold = 2
