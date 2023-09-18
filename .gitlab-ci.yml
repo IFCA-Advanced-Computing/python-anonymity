@@ -24,7 +24,7 @@ default:
   before_script:
     - python --version  # For debugging
     - pip install --upgrade pip
-    - pip install virtualenv
+    - pip3 install virtualenv
     - virtualenv venv
     - source venv/bin/activate
     - pip install tox
