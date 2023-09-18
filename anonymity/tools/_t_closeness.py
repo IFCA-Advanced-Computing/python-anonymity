@@ -6,7 +6,6 @@ import pandas as pd
 import pycanon.anonymity as pc
 from pycanon.anonymity.utils import aux_functions
 from pycanon.anonymity.utils.aux_anonymity import get_equiv_class
-
 from anonymity.tools._k_anonymity import data_fly
 from anonymity.tools._k_anonymity import incognito
 
@@ -139,7 +138,7 @@ def t_closeness(
     supp_threshold: int,
     hierarchies: dict,
 ) -> pd.DataFrame:
-    """Return the l-diversity value as an integer.
+    """Return the t-closeness value as an integer.
     Calls the get_diversities and extract the minimum l-diversity level.
 
         :param table: dataframe with the data under study.
@@ -167,20 +166,21 @@ def t_closeness(
     k = 0
     type_t = "num"
 
-    if isinstance(table[sa][0], str):
+    if isinstance(table[sa[0]][0], str):
         type_t = "cat"
 
-    while pc.t_closeness(table, qi, sa, type_t) > t and count < 50:
+    # TODO Hacer variable global
+    while pc.t_closeness(table, qi, sa) > t and count < 50:
         if k_method == "data_fly":
             k = k + 1
             table = data_fly(table, ident, qi, k, supp_threshold, hierarchies)
 
         else:
             k = k + 1
-            table = incognito(table, hierarchies, k, qi, supp_threshold, ident)
+            table = incognito(table, ident, qi, k, supp_threshold, hierarchies)
         count += 1
 
-    if count >= 50:
+    if count >= 50 or pc.t_closeness(table, qi, sa, type_t) > 1:
         print("t-closeness not satisfied")
         return [pc.t_closeness(table, qi, sa), table, False]
 
@@ -201,10 +201,15 @@ def t_closeness_supp(
     supp_records = round(total_percent * (supp_lim / 100))
     t_real = pc.t_closeness(table, qi, sa)
     if t_real < t:
-        print(f"t_closeness is satisfied with t={t_real}")
+        print(f"t-closeness is satisfied with t={t_real}")
         return table
 
-    t_eq_c = get_t(table, sa, qi)
+    type_t = "num"
+
+    if isinstance(table[sa[0]][0], str):
+        type_t = "cat"
+
+    t_eq_c = get_t(table, sa, qi, type_t)
 
     if t > max(t_eq_c.values()):
         print("t_closeness cannot be satisfied only with row suppression")
