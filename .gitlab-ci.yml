@@ -23,6 +23,7 @@ cache:
 default:
   before_script:
     - python --version  # For debugging
+    - pip install --upgrade pip
     - pip install virtualenv
     - virtualenv venv
     - source venv/bin/activate
