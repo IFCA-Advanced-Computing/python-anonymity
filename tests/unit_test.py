@@ -606,7 +606,7 @@ class UnitTest(unittest.TestCase):
             t,
             supp_limit,
         )
-        assert t <= pycanon.anonymity.t_closeness(new_data, self.QI, self.SA)
+        assert t < pycanon.anonymity.t_closeness(new_data, self.QI, self.SA)
 
 #####################################################
 

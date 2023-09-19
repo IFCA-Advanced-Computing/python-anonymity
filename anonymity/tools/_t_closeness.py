@@ -167,8 +167,9 @@ def t_closeness(
         :param hierarchies: hierarchies for generalization of columns.
         :type hierarchies: dictionary
 
-        :return: table that covers t-closeness.
-        :rtype: pandas dataframe
+        :return: list which contains the value of t for the anonymized table, the current table that after applying
+         t-closeness and true or false whether t-closeness is actually satisfied.
+        :rtype: list
     """
 
     count = 0
@@ -269,12 +270,12 @@ def t_closeness_supp(
             # print(type(ec_elim[0]))
             table_new = table.drop(int(ec_elim[0])).reset_index()
             supp_rate = (len(table) - len(table_new)) / len(table)
-            if supp_rate > supp_records:
+            if supp_rate > supp_records or pc.t_closeness(table_new, qi, sa) > t:
                 print(
                     f"t-closeness cannot be satisfied by deleting less than "
                     f"{supp_records}% of the records."
                 )
                 return table
             else:
-                assert pc.t_closeness(table_new, qi, sa) >= t
+                assert pc.t_closeness(table_new, qi, sa) <= t
                 return table_new

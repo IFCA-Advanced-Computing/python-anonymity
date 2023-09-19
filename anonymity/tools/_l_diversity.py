@@ -268,8 +268,9 @@ def apply_l_diversity_multiple_sa(
     :param hierarchies: hierarchies for generalization of columns.
     :type hierarchies: dictionary
 
-    :return: anonymized table that satisfies l-diversity.
-    :rtype: pandas dataframe
+    :return: returns a list containing the value of l-diversity of the new table and the
+    anonymized table that satisfies l-diversity.
+    :rtype: list
     """
     limit = len(sa)
     count = 0
