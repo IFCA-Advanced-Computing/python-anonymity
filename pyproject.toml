@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "python-anonymity"
-version = "0.0.1"
+name = "python_anonymity"
+version = "0.0.1.post1"
 authors = [
     { name="esmeralda.madrazo", email="esme21100@gmail.com" },
 ]
