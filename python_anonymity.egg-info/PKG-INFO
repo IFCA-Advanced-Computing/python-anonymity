@@ -1,0 +1,11 @@
+Metadata-Version: 2.1
+Name: python-anonymity
+Version: 0.0.1
+Summary: Library which offers anonymization techniques and metrics to anonymize tabular datasets
+Home-page: https://github.com/python-anonymity
+Author: CSIC
+License: Apache License
+Description: # TFM-Python-Library-for-Anonymization
+        
+Platform: UNKNOWN
+Description-Content-Type: text/markdown
