@@ -331,11 +331,11 @@ def incognito(
 
 def k_anonymity(
     table: pd.DataFrame,
-    hierarchies: dict,
-    k: int,
-    qi: typing.Union[typing.List, np.ndarray],
-    supp_threshold: int,
     ident: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k: int,
+    supp_threshold: int,
+    hierarchies: dict,
     method: str,
 ) -> pd.DataFrame:
     """Generalization algorithm for k-anonymity. Applies data-fly for default in case we don't specify correctly.
@@ -368,9 +368,8 @@ def k_anonymity(
     """
 
     if method.lower() == "incognito":
-        return incognito(table, hierarchies, k, qi, supp_threshold, ident)
+        return incognito(table, ident, qi, k, supp_threshold, hierarchies)
     elif method.lower() == "datafly" or method.lower() == "data fly":
-        return data_fly(table, hierarchies, k, qi, supp_threshold, ident)
+        return data_fly(table, ident, qi, k, supp_threshold, hierarchies)
     else:
         raise ValueError("Unimplemented k-anonymity method.")
-
