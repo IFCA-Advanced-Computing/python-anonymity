@@ -91,7 +91,7 @@ def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
     occurancies of each element on both the original table and the anonymized table.
     :rtype: array of dictionaries
     """
-    
+
     vgh = {}
     numb_vgh = {}
 
@@ -139,7 +139,7 @@ def generalized_information_loss(
     :return: The penalty incurred when generalizing a table.
     :rtype: float
     """
-    
+
     vgh_aux = create_vgh(hierarchy)
     vgh = vgh_aux[0]
     numb_vgh = vgh_aux[1]
@@ -219,4 +219,3 @@ def avr_equiv_class_size(
     k = anonymity.k_anonymity(new_table, qi)
     eq = anonymity.utils.aux_anonymity.get_equiv_class(new_table, qi)
     return t / (len(eq) * k)
-

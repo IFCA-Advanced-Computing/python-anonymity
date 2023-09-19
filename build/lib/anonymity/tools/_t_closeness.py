@@ -140,36 +140,36 @@ def t_closeness(
 ) -> pd.DataFrame:
     """Apply t-closeness to an anonymized dataset.
 
-        :param table: dataframe with the data under study.
-        :type table: pandas dataframe
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
 
-        :param sa: list with the name of the columns of the dataframe.
-            that are sensitive attributes.
-        :type sa: list of strings
+    :param sa: list with the name of the columns of the dataframe.
+        that are sensitive attributes.
+    :type sa: list of strings
 
-        :param qi: list with the name of the columns of the dataframe.
-            that are quasi-identifiers.
-        :type qi: list of strings
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
 
-        :param t: threshold for t-closeness
-        :type t: float
+    :param t: threshold for t-closeness
+    :type t: float
 
-        :param k_method: string that specifies the type of k-anonymization we want to use
-        :type k_method: string
+    :param k_method: string that specifies the type of k-anonymization we want to use
+    :type k_method: string
 
-        :param ident: list with the name of the columns of the dataframe.
-            that are identifiers.
-        :type ident: list of strings
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
 
-        :param supp_threshold: level of suppression allowed.
-        :type supp_threshold: int
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
 
-        :param hierarchies: hierarchies for generalization of columns.
-        :type hierarchies: dictionary
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
 
-        :return: list which contains the value of t for the anonymized table, the current table that after applying
-         t-closeness and true or false whether t-closeness is actually satisfied.
-        :rtype: list
+    :return: list which contains the value of t for the anonymized table, the current table that after applying
+     t-closeness and true or false whether t-closeness is actually satisfied.
+    :rtype: list
     """
 
     count = 0
@@ -202,7 +202,6 @@ def t_closeness(
         return [pc.t_closeness(table, qi, sa), table, True]
 
 
-
 def t_closeness_supp(
     table: pd.DataFrame,
     sa: typing.Union[typing.List, np.ndarray],
@@ -212,26 +211,26 @@ def t_closeness_supp(
 ) -> pd.DataFrame:
     """Apply t-closeness to an anonymized dataset using suppressing up to the established percentage allowed as input.
 
-            :param table: dataframe with the data under study.
-            :type table: pandas dataframe
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
 
-            :param sa: list with the name of the columns of the dataframe.
-                that are sensitive attributes.
-            :type sa: list of strings
+    :param sa: list with the name of the columns of the dataframe.
+        that are sensitive attributes.
+    :type sa: list of strings
 
-            :param qi: list with the name of the columns of the dataframe.
-                that are quasi-identifiers.
-            :type qi: list of strings
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
 
-            :param t: threshold for t-closeness
-            :type t: float
+    :param t: threshold for t-closeness
+    :type t: float
 
-            :param supp_lim: percentage of suppressed rows allowed
-            :type supp_lim: float
+    :param supp_lim: percentage of suppressed rows allowed
+    :type supp_lim: float
 
-            :return: table that covers t-closeness.
-            :rtype: pandas dataframe
-        """
+    :return: table that covers t-closeness.
+    :rtype: pandas dataframe
+    """
 
     total_percent = len(table)
     # print(len(table))

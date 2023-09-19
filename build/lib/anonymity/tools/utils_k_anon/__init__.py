@@ -17,4 +17,3 @@
 __all__ = [
     "utils_k_anonymity",
 ]
-

@@ -1,4 +1,6 @@
+MANIFEST.in
 README.md
+requirements.txt
 setup.py
 anonymity/__init__.py
 anonymity/metrics/__init__.py

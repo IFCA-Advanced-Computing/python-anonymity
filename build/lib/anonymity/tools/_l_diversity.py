@@ -318,39 +318,39 @@ def l_diversity(
 ) -> pd.DataFrame:
     """Apply l-diversity to an anonymized dataset.
 
-        :param table: dataframe with the data under study.
-        :type table: pandas dataframe
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
 
-        :param sa: list with the name of the columns of the dataframe.
-            that are sensitive attributes.
-        :type sa: list of strings
+    :param sa: list with the name of the columns of the dataframe.
+        that are sensitive attributes.
+    :type sa: list of strings
 
-        :param ident: list with the name of the columns of the dataframe.
-            that are identifiers.
-        :type ident: list of strings
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
 
-        :param qi: list with the name of the columns of the dataframe.
-            that are quasi-identifiers.
-        :type qi: list of strings
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
 
-        :param k: desired level of k-anonymity.
-        :type k: int
+    :param k: desired level of k-anonymity.
+    :type k: int
 
-        :param k_method: desired algorithm for anonymization.
-        :type k_method: string
+    :param k_method: desired algorithm for anonymization.
+    :type k_method: string
 
-        :param l: desired level of l-diversity.
-        :type l: int
+    :param l: desired level of l-diversity.
+    :type l: int
 
-        :param supp_threshold: level of suppression allowed.
-        :type supp_threshold: int
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
 
-        :param hierarchies: hierarchies for generalization of columns.
-        :type hierarchies: dictionary
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
 
-        :return: returns a list containing the value of l-diversity of the new table and the
-        anonymized table that satisfies l-diversity.
-        :rtype: list
+    :return: returns a list containing the value of l-diversity of the new table and the
+    anonymized table that satisfies l-diversity.
+    :rtype: list
     """
     if len(sa) > 1:
         return apply_l_diversity_multiple_sa(
