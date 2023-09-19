@@ -24,6 +24,5 @@ __all__ = [
     "t_closeness",
     "t_closeness_supp",
     "data_fly",
-    "incognito"
+    "incognito",
 ]
-

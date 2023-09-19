@@ -107,4 +107,3 @@ def monitor_memory_consumption_stop():
     memory = tr.get_traced_memory()
     print("Peak memory use: ", memory[1])
     tr.stop()
-    
