@@ -1,0 +1,17 @@
+README.md
+setup.py
+anonymity/__init__.py
+anonymity/metrics/__init__.py
+anonymity/metrics/data_utility_metrics.py
+anonymity/metrics/efficiency_metrics.py
+anonymity/tools/__init__.py
+anonymity/tools/_k_anonymity.py
+anonymity/tools/_l_diversity.py
+anonymity/tools/_t_closeness.py
+anonymity/tools/utils_k_anon/__init__.py
+anonymity/tools/utils_k_anon/utils_k_anonymity.py
+python_anonymity.egg-info/PKG-INFO
+python_anonymity.egg-info/SOURCES.txt
+python_anonymity.egg-info/dependency_links.txt
+python_anonymity.egg-info/requires.txt
+python_anonymity.egg-info/top_level.txt
