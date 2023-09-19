@@ -7,8 +7,16 @@ from anonymity.tools.utils_k_anon import utils_k_anonymity as utils
 class TestAdult:
     qi = ["age", "education", "occupation", "marital-status", "race", "sex"]
     sa = ["salary-class"]
-    ident = ["workclass", "fnlwgt", "education-num", "relationship", "capital-gain", "capital-loss",
-             "hours-per-week", "native-country"]
+    ident = [
+        "workclass",
+        "fnlwgt",
+        "education-num",
+        "relationship",
+        "capital-gain",
+        "capital-loss",
+        "hours-per-week",
+        "native-country",
+    ]
     supp_threshold = 1
     age_hierarchy = {"age": [0, 2, 5, 10]}
     hierarchy = {
