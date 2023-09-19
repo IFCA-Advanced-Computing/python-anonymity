@@ -21,7 +21,7 @@ requirements:
 
 **Documentation**
 
-> The python-anonymity documentation is hosted on Read the Docs.
+> The python-anonymity documentation is hosted on [Read the Docs](https://python-anonymity.readthedocs.io/en/latest/).
 
 
 **Getting started**
