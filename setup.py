@@ -4,9 +4,9 @@ import setuptools
 HERE = pathlib.Path(__file__).parent
 
 VERSION = "0.0.1"
-PACKAGE_NAME = "python-anonymity"
+PACKAGE_NAME = "python_anonymity"
 AUTHOR = "CSIC"
-URL = "https://github.com/python-anonymity"  # TODO Añadir el enlace final
+URL = "https://github.com/IFCA/python-anonymity" 
 LICENSE = "Apache License"
 DESCRIPTION = "Library which offers anonymization techniques and metrics to anonymize tabular datasets"
 LONG_DESCRIPTION = (HERE / "README.md").read_text(encoding="utf-8")
