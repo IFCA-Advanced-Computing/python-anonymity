@@ -8,76 +8,76 @@ This library supports the application of three classical anonymization technique
 > We recommend to use Python3 with  virtualenv:
 > 
 ```
-> virtualenv .venv -p python3
-> source .venv/bin/activate
+virtualenv .venv -p python3
+source .venv/bin/activate
 ```
 
 
-Then run the following command to install the library and all its
+> Then run the following command to install the library and all its
 requirements:
 
-`pip install python-anonymity`
-
+```
+pip install python-anonymity
+```
 
 **Documentation**
 
-> The python-anonymity documentation is hosted on Read the Docs.
+> The python-anonymity documentation is hosted on [Read the Docs](https://python-anonymity.readthedocs.io/en/latest/).
 
 
 **Getting started**
 > Example using the crime synthetic dataset:
 > 
 ```
-> import pandas as pd
-> import pycanon
-> from anonymity import tools
-> from anonymity.tools.utils_k_anon import utils_k_anonymity as utils
-> 
-> d = {
->         "name": ["Joe", "Jill", "Sue", "Abe", "Bob", "Amy"],
->         "marital stat": [
->             "Separated",
->             "Single",
->             "Widowed",
->             "Separated",
->             "Widowed",
->             "Single",
->         ],
->         "age": [29, 20, 24, 28, 25, 23],
->         "ZIP code": ["32042", "32021", "32024", "32046", "32045", "32027"],
->         "crime": ["Murder", "Theft", "Traffic", "Assault", "Piracy", "Indecency"],
->     }
->     data = pd.DataFrame(data=d)
-> 
->     ID = ["name"]
->     QI = ["marital stat", "age", "ZIP code"]
->     SA = ["crime"]
->     age_hierarchy = {"age": [0, 2, 5, 10]}
->     hierarchy = {
->         "marital stat": [
->             ["Single", "Not married", "*"],
->             ["Separated", "Not married", "*"],
->             ["Divorce", "Not married", "*"],
->             ["Widowed", "Not married", "*"],
->             ["Married", "Married", "*"],
->             ["Re-married", "Married", "*"],
->         ],
->         "ZIP code": [
->             ["32042", "3204*", "*"],
->             ["32021", "3202*", "*"],
->             ["32024", "3202*", "*"],
->             ["32046", "3204*", "*"],
->             ["32045", "3204*", "*"],
->             ["32027", "3202*", "*"],
->         ],
->     }
-> 
->     mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
+import pandas as pd
+import pycanon
+from anonymity import tools
+from anonymity.tools.utils_k_anon import utils_k_anonymity as utils
+ 
+d = {
+        "name": ["Joe", "Jill", "Sue", "Abe", "Bob", "Amy"],
+        "marital stat": [
+           "Separated",
+           "Single",
+           "Widowed",
+           "Separated",
+           "Widowed",
+           "Single",
+        ],
+        "age": [29, 20, 24, 28, 25, 23],
+        "ZIP code": ["32042", "32021", "32024", "32046", "32045", "32027"],
+        "crime": ["Murder", "Theft", "Traffic", "Assault", "Piracy", "Indecency"],
+    }
 
->     k = 2
->     supp_threshold = 0
->     new_data = tools.data_fly(data, ID, QI, k, supp_threshold, self.mix_hierarchy)
-> 
+data = pd.DataFrame(data=d)
+ID = ["name"]
+QI = ["marital stat", "age", "ZIP code"]
+SA = ["crime"]
+age_hierarchy = {"age": [0, 2, 5, 10]}
+hierarchy = {
+         "marital stat": [
+             ["Single", "Not married", "*"],
+             ["Separated", "Not married", "*"],
+             ["Divorce", "Not married", "*"],
+             ["Widowed", "Not married", "*"],
+             ["Married", "Married", "*"],
+             ["Re-married", "Married", "*"],
+         ],
+         "ZIP code": [
+             ["32042", "3204*", "*"],
+             ["32021", "3202*", "*"],
+             ["32024", "3202*", "*"],
+             ["32046", "3204*", "*"],
+             ["32045", "3204*", "*"],
+             ["32027", "3202*", "*"],
+         ],
+     }
+ 
+mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
+
+k = 2
+supp_threshold = 0
+new_data = tools.data_fly(data, ID, QI, k, supp_threshold, mix_hierarchy)
 ```
 
 
