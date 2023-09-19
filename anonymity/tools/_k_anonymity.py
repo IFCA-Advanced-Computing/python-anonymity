@@ -127,6 +127,23 @@ def data_fly(
 
 
 def new_level(current_lv, interval, lattice, limits):
+    """Takes care of calculating the next level of the lattice.
+
+    :param current_lv: current level of the lattice.
+    :type current_lv: int
+
+    :param interval: corresponding to the level of the lattice
+    :type ident: interval
+
+    :param lattice: full lattice for incognito
+    :type lattice: pandas dataframe
+
+    :param limits: numerical limits for each of the parameters that conform the lattice nodes
+    :type lattice: list of ints
+
+    :return: lattice with a new level added
+    :rtype: pandas dataframe
+    """
     for i, value in enumerate(interval):
         if value < limits[i]:
             new_interval = copy.deepcopy(interval)
@@ -137,8 +154,16 @@ def new_level(current_lv, interval, lattice, limits):
 
 
 def generate_lattice(hierarchies):
+    """Generates a lattice for a given hierarchy to apply incognito.
+
+    :param hierarchies: hierarchy for a given dataset
+    :type hierarchies: pandas dataframe
+
+    :return: full lattice ready to apply incognito
+    :rtype: pandas dataframe
+    """
     ranges_aux = []
-    print(hierarchies)
+    # print(hierarchies)
     keys = hierarchies.keys()
     limits = []
 
@@ -159,6 +184,20 @@ def generate_lattice(hierarchies):
 
 
 def generalize(table, node, hierarchies):
+    """Generalices a table for a given node of the lattice.
+
+    :param table: table that will be anonymized
+    :type table: pandas dataframe
+
+    :param node: singular node of the lattice that contains the level of generalization for each QI
+    :type node: list of ints
+
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
+
+    :return: anonymized table.
+    :rtype: pandas dataframe
+    """
     for i in range(len(node)):
         if node[i] != 0:
             name = list(hierarchies.keys())[i]
@@ -292,16 +331,45 @@ def incognito(
 
 def k_anonymity(
     table: pd.DataFrame,
-    hierarchies: dict,
-    k: int,
-    qi: typing.Union[typing.List, np.ndarray],
-    supp_threshold: int,
     ident: typing.Union[typing.List, np.ndarray],
+    qi: typing.Union[typing.List, np.ndarray],
+    k: int,
+    supp_threshold: int,
+    hierarchies: dict,
     method: str,
 ) -> pd.DataFrame:
+    """Generalization algorithm for k-anonymity. Applies data-fly for default in case we don't specify correctly.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
+
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
+
+    :param k: desired level of k-anonymity.
+    :type k: int
+
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
+
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
+
+    :param method: name of the anonymization method that we want to use.
+    :type method: string
+
+    :return: anonymized table.
+    :rtype: pandas dataframe
+    """
+
     if method.lower() == "incognito":
-        return incognito(table, hierarchies, k, qi, supp_threshold, ident)
+        return incognito(table, ident, qi, k, supp_threshold, hierarchies)
     elif method.lower() == "datafly" or method.lower() == "data fly":
-        return data_fly(table, hierarchies, k, qi, supp_threshold, ident)
+        return data_fly(table, ident, qi, k, supp_threshold, hierarchies)
     else:
         raise ValueError("Unimplemented k-anonymity method.")

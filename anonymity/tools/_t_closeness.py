@@ -138,30 +138,43 @@ def t_closeness(
     supp_threshold: int,
     hierarchies: dict,
 ) -> pd.DataFrame:
-    """Return the t-closeness value as an integer.
-    Calls the get_diversities and extract the minimum l-diversity level.
+    """Apply t-closeness to an anonymized dataset.
 
-        :param table: dataframe with the data under study.
-        :type table: pandas dataframe
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
 
-        :param sa: list with the name of the columns of the dataframe.
-            that are sensitive attributes.
-        :type sa: list of strings
+    :param sa: list with the name of the columns of the dataframe.
+        that are sensitive attributes.
+    :type sa: list of strings
 
-        :param qi: list with the name of the columns of the dataframe.
-            that are quasi-identifiers.
-        :type qi: list of strings
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
 
-        :param t: threshold for t-closeness
-        :type t: float
+    :param t: threshold for t-closeness
+    :type t: float
 
-        :return: table that covers t-closeness.
-        :rtype: pandas dataframe
+    :param k_method: string that specifies the type of k-anonymization we want to use
+    :type k_method: string
+
+    :param ident: list with the name of the columns of the dataframe.
+        that are identifiers.
+    :type ident: list of strings
+
+    :param supp_threshold: level of suppression allowed.
+    :type supp_threshold: int
+
+    :param hierarchies: hierarchies for generalization of columns.
+    :type hierarchies: dictionary
+
+    :return: list which contains the value of t for the anonymized table, the current table that after applying
+     t-closeness and true or false whether t-closeness is actually satisfied.
+    :rtype: list
     """
 
     count = 0
-    print(t)
-    print(pc.t_closeness(table, qi, sa))
+    # print(t)
+    # print(pc.t_closeness(table, qi, sa))
 
     k = 0
     type_t = "num"
@@ -189,7 +202,6 @@ def t_closeness(
         return [pc.t_closeness(table, qi, sa), table, True]
 
 
-# TODO Fijarme en la de l-diversity de pycanon para diferenciar entre letras y numeros en los qi
 def t_closeness_supp(
     table: pd.DataFrame,
     sa: typing.Union[typing.List, np.ndarray],
@@ -197,13 +209,38 @@ def t_closeness_supp(
     t: float,
     supp_lim: float = 1,
 ) -> pd.DataFrame:
+    """Apply t-closeness to an anonymized dataset using suppressing up to the established percentage allowed as input.
+
+    :param table: dataframe with the data under study.
+    :type table: pandas dataframe
+
+    :param sa: list with the name of the columns of the dataframe.
+        that are sensitive attributes.
+    :type sa: list of strings
+
+    :param qi: list with the name of the columns of the dataframe.
+        that are quasi-identifiers.
+    :type qi: list of strings
+
+    :param t: threshold for t-closeness
+    :type t: float
+
+    :param supp_lim: percentage of suppressed rows allowed
+    :type supp_lim: float
+
+    :return: table that covers t-closeness.
+    :rtype: pandas dataframe
+    """
+
     total_percent = len(table)
-    supp_records = round(total_percent * (supp_lim / 100))
+    # print(len(table))
+    supp_records = round(total_percent * supp_lim)
     t_real = pc.t_closeness(table, qi, sa)
     if t_real < t:
         print(f"t-closeness is satisfied with t={t_real}")
         return table
 
+    # print(supp_records)
     type_t = "num"
 
     if isinstance(table[sa[0]][0], str):
@@ -220,22 +257,24 @@ def t_closeness_supp(
         while supp_rate <= supp_records:
             data_ec = pd.DataFrame({"equiv_class": t_eq_c.keys(), "t": t_eq_c.values()})
             data_ec_t = data_ec[data_ec.t > t]
-            print(data_ec_t)
+            # print(data_ec_t)
             ec_elim = np.concatenate(
                 [
-                    pc.utils.aux_functions.convert(ec)
+                    pc.utils.aux_functions.convert(ec[2])
                     for ec in data_ec_t.equiv_class.values
                 ]
             )
-            print(ec_elim)
-            table_new = table.drop(ec_elim[0]).reset_index()
+
+            # print(ec_elim)
+            # print(type(ec_elim[0]))
+            table_new = table.drop(int(ec_elim[0])).reset_index()
             supp_rate = (len(table) - len(table_new)) / len(table)
-            if supp_rate > supp_records:
+            if supp_rate > supp_records or pc.t_closeness(table_new, qi, sa) > t:
                 print(
                     f"t-closeness cannot be satisfied by deleting less than "
                     f"{supp_records}% of the records."
                 )
                 return table
             else:
-                assert pc.t_closeness(table_new, qi, sa) >= t
+                assert pc.t_closeness(table_new, qi, sa) <= t
                 return table_new
