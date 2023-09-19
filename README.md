@@ -74,9 +74,9 @@ requirements:
 > 
 >     mix_hierarchy = dict(hierarchy, **utils.create_ranges(data, age_hierarchy))
 
-> k = 2
->         supp_threshold = 0
->         new_data = tools.data_fly(data, ID, QI, k, supp_threshold, self.mix_hierarchy)
+>     k = 2
+>     supp_threshold = 0
+>     new_data = tools.data_fly(data, ID, QI, k, supp_threshold, self.mix_hierarchy)
 > 
 ```
 
