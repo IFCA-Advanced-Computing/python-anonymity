@@ -110,6 +110,8 @@ def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
 
     return [vgh, numb_vgh]
 
+# TODO ARREGLAR FUNCION
+
 
 def generalized_information_loss(
     hierarchy: dict,
