@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pycanon.anonymity
 from pycanon import anonymity
-from pycanon.anonymity import utils
+# from pycanon.anonymity import utils
 import anonymity.metrics.efficiency_metrics as em
 import anonymity.metrics.data_utility_metrics as dat_ut
 from anonymity.tools.utils_k_anon import utils_k_anonymity as ut
@@ -138,7 +138,8 @@ def new_level(current_lv, interval, lattice, limits):
     :param lattice: full lattice for incognito
     :type lattice: pandas dataframe
 
-    :param limits: numerical limits for each of the parameters that conform the lattice nodes
+    :param limits: numerical limits for each of the parameters that
+    conform the lattice nodes
     :type lattice: list of ints
 
     :return: lattice with a new level added
@@ -189,7 +190,8 @@ def generalize(table, node, hierarchies):
     :param table: table that will be anonymized
     :type table: pandas dataframe
 
-    :param node: singular node of the lattice that contains the level of generalization for each QI
+    :param node: singular node of the lattice that contains the level of
+    generalization for each QI
     :type node: list of ints
 
     :param hierarchies: hierarchies for generalization of columns.
@@ -338,7 +340,8 @@ def k_anonymity(
     hierarchies: dict,
     method: str,
 ) -> pd.DataFrame:
-    """Generalization algorithm for k-anonymity. Applies data-fly for default in case we don't specify correctly.
+    """Generalization algorithm for k-anonymity. Applies data-fly for default
+    in case we don't specify correctly.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe

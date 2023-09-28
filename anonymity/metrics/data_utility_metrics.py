@@ -118,7 +118,8 @@ def generalized_information_loss(
     qi: typing.Union[typing.List, np.ndarray],
 ) -> float:
     """Capture the penalty incurred when generalizing a table, by quantifying the
-    fraction of the domain values that have been generalized for each specific attribute.
+    fraction of the domain values that have been generalized for each specific
+    attribute.
 
     :param hierarchy: hierarchies for generalization of string columns.
     :type hierarchy: dictionary
@@ -181,8 +182,6 @@ def discernibility(
     :return: Measure of how indistinguishable the table is.
     :rtype: float
     """
-
-    t = len(og_table)
     k = anonymity.k_anonymity(new_table, qi)
     eq = anonymity.utils.aux_anonymity.get_equiv_class(new_table, qi)
     a = 0
@@ -198,8 +197,8 @@ def avr_equiv_class_size(
     new_table: pd.DataFrame,
     qi: typing.Union[typing.List, np.ndarray],
 ) -> float:
-    """Measure how well the creation of the EQs approaches the best case, where each record
-    is generalized in an EQ of k records.
+    """Measure how well the creation of the EQs approaches the best case,
+    where each record is generalized in an EQ of k records.
 
     :param og_table: dataframe with the original data under study.
     :type og_table: pandas dataframe

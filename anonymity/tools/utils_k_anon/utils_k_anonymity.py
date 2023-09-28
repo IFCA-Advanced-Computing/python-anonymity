@@ -201,7 +201,8 @@ def generalization(
     :param hierarchies: hierarchies for generalization of string columns.
     :type hierarchies: dictionary
 
-    :param gen_level: Current level of generalization of each of the columns of the table.
+    :param gen_level: Current level of generalization of each of the columns
+    of the table.
     :type gen_level: int
 
     :param name: Name of the column that needs to be generalized.

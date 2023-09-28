@@ -1,4 +1,3 @@
-import copy
 import re
 import typing
 import numpy as np
@@ -167,8 +166,9 @@ def t_closeness(
     :param hierarchies: hierarchies for generalization of columns.
     :type hierarchies: dictionary
 
-    :return: list which contains the value of t for the anonymized table, the current table that after applying
-     t-closeness and true or false whether t-closeness is actually satisfied.
+    :return: list which contains the value of t for the anonymized table,
+    the current table that after applying
+    t-closeness and true or false whether t-closeness is actually satisfied.
     :rtype: list
     """
 
@@ -209,7 +209,8 @@ def t_closeness_supp(
     t: float,
     supp_lim: float = 1,
 ) -> pd.DataFrame:
-    """Apply t-closeness to an anonymized dataset using suppressing up to the established percentage allowed as input.
+    """Apply t-closeness to an anonymized dataset using suppressing up to
+    the established percentage allowed as input.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe

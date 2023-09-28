@@ -12,8 +12,8 @@ def get_diversities(
     sa: typing.Union[typing.List, np.ndarray],
     qi: typing.Union[typing.List, np.ndarray],
 ) -> typing.Union[typing.List, np.ndarray]:
-    """Return the l-diversity value as an integer. Calls the get_diversities and extract the
-    minimum l-diversity level.
+    """Return the l-diversity value as an integer. Calls the get_diversities and
+    extract the minimum l-diversity level.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe
@@ -155,8 +155,6 @@ def apply_l_diversity_supp(
         return table_new
 
 
-# La idea es que usando las funciones auxiliares de arriba esto devolviera una nueva tabla anonimizada
-# con una k superior.
 def apply_l_diversity(
     table: pd.DataFrame,
     sa: typing.Union[typing.List, np.ndarray],
@@ -278,7 +276,7 @@ def apply_l_diversity_multiple_sa(
     l_div = []
     new_hierarchies = copy.deepcopy(hierarchies)
     while count < limit:
-        new_qi = qi + sa[:count] + sa[count + 1 :]
+        new_qi = qi + sa[:count] + sa[count + 1:]
         # print(new_qi)
         new_sa = sa[count]
 
