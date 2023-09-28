@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
-    """Deletes any white spaces from column names.
+    """Delete any white spaces from column names.
 
     :param table:  dataframe with the data under study.
     :type table: pandas dataframe
@@ -27,7 +27,7 @@ def clear_white_spaces(table: pd.DataFrame) -> pd.DataFrame:
 def suppress_identifiers(
     table: pd.DataFrame, ident: typing.Union[typing.List, np.ndarray]
 ) -> pd.DataFrame:
-    """Removes all the identifiers in the database.
+    """Remove all the identifiers in the database.
 
     :param table: dataframe with the data under study.
     :type table: pandas dataframe
@@ -48,7 +48,7 @@ def suppress_identifiers(
 def string_to_interval(
     column: typing.Union[typing.List, np.ndarray]
 ) -> typing.Union[typing.List, np.ndarray]:
-    """Converts a string interval to an actual interval type,
+    """Convert a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
     :param column: List of intervals as strings.
@@ -193,7 +193,7 @@ def generalization(
     gen_level: int,
     name: str,
 ) -> typing.Union[typing.List, np.ndarray, None]:
-    """Generalizes a column based on its data type.
+    """Generalize a column based on its data type.
 
     :param column: column from the table under study that needs to be generalized.
     :type column: list of values

@@ -8,7 +8,7 @@ LEVEL_GEN = {}
 
 
 def start_level():
-    """Resets the global variable which contains the generalization
+    """Reset the global variable which contains the generalization
     levels of each parameter of the table of the function which is
     being monitored."""
 
@@ -17,7 +17,7 @@ def start_level():
 
 
 def get_level_generalization(name: str, level: int):
-    """Updates the global variable which contains the generalization
+    """Update the global variable which contains the generalization
     levels of each parameter of the table of the function which is being monitored.
 
     :param name: Name of the column which level we want to save
@@ -34,7 +34,7 @@ def get_level_generalization(name: str, level: int):
 def string_to_interval(
     column: typing.Union[typing.List, np.ndarray]
 ) -> typing.Union[typing.List, np.ndarray]:
-    """Converts a string interval to an actual interval type,
+    """Convert a string interval to an actual interval type,
     to facilitate the comparison of each data.
 
     :param column: List of intervals as strings.
@@ -72,7 +72,7 @@ def string_to_interval(
 
 
 def create_vgh(hierarchy: dict) -> typing.Union[typing.List, np.ndarray]:
-    """Creates the auxiliary hierarchies to facilitate the measuring of the
+    """Create the auxiliary hierarchies to facilitate the measuring of the
     information loss function.
 
     :param hierarchy: hierarchies for generalization of string columns.
@@ -117,7 +117,7 @@ def generalized_information_loss(
     new_table: pd.DataFrame,
     qi: typing.Union[typing.List, np.ndarray],
 ) -> float:
-    """Captures the penalty incurred when generalizing a table, by quantifying the
+    """Capture the penalty incurred when generalizing a table, by quantifying the
     fraction of the domain values that have been generalized for each specific attribute.
 
     :param hierarchy: hierarchies for generalization of string columns.
@@ -165,7 +165,7 @@ def discernibility(
     new_table: pd.DataFrame,
     qi: typing.Union[typing.List, np.ndarray],
 ) -> float:
-    """Measures how indistinguishable a record is from others, by assigning a
+    """Measure how indistinguishable a record is from others, by assigning a
     penalty to each record, equal to the size of the EQ to which it belongs.
 
     :param og_table: dataframe with the original data under study.
@@ -198,7 +198,7 @@ def avr_equiv_class_size(
     new_table: pd.DataFrame,
     qi: typing.Union[typing.List, np.ndarray],
 ) -> float:
-    """Measures how well the creation of the EQs approaches the best case, where each record
+    """Measure how well the creation of the EQs approaches the best case, where each record
     is generalized in an EQ of k records.
 
     :param og_table: dataframe with the original data under study.
